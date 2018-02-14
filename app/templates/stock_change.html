@@ -1,0 +1,27 @@
+<script type="text/javascript" src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>  
+{% extends "base.html" %}
+{% block content %}
+<h1>Hi, {{user}}!</h1>
+{% for stock in stocks %}
+<div style="border:1px solid #000;width:200px;height:220px" onclick="sclick({{stock.id}})">
+    <p>{{stock.name}} price: {{stock.price}}<br>total: {{stock.total}}
+    </p>
+</div>
+{% endfor %}
+<script>  
+function sclick(id){  
+    window.location.href='./stock/?id='+id;
+}  
+$('#oo').bind('click',function(event){
+    alert('im a');
+    event.stopPropagation();
+
+});
+</script>
+<style> 
+div{  
+    display: inline-block;  
+}  
+</style> 
+{% endblock %}
+

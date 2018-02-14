@@ -1,0 +1,39 @@
+<html>
+  <head>
+    {% if title %}
+    <title>{{title}}</title>
+    {% else %}
+    <title>test page</title>
+    {% endif %}
+  </head>
+  <body>
+    <div>
+        <a href="{{ url_for('index') }}">Home</a>
+        {% if 'username' in session %}
+            <a href="{{ url_for('logout') }}">sign out</a>
+            <a href="{{ url_for('stock_change') }}">stock_change</a>
+            
+
+            用户:
+            <a href="{{ url_for('user',id=user) }}">{{user}}</a>
+
+            
+        {% else %}
+            <a href="{{ url_for('login') }}">sign in</a>
+            <a href="{{ url_for('register') }}">register</a>
+        {% endif %}
+
+        
+        
+    </div>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    <ul>
+    {% for message in messages %}
+        <li>{{ message }} </li>
+    {% endfor %}
+    </ul>
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </body>
+</html>

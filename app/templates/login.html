@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Sign In</h1>
+  <form action="{{ url_for('login') }}" method="post" name="login">
+      {{ form.csrf_token }}
+      <p>
+          {{ form.username.label }}<br>
+          {{ form.username(size=80) }}<br>
+      </p>
+      <p>
+          {{ form.password.label }}<br>
+          <!-- 我们可以传递input标签的属性，这里传递的是size属性 -->
+          {{ form.password(size=80) }}<br>
+      </p>
+      <p>{{ form.remember_me }} Remember Me</p>
+      <p><input type="submit" value="Sign In"></p>
+  </form>
+{% endblock %}
+

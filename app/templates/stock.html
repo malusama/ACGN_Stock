@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Hi, {{user}}!</h1>
+{% for stock in stocks %}
+<div>
+    <p>{{stock.name}}<br> price: {{stock.price}}<br>totle: {{stock.total}}<b>
+    </p>
+    <a href="{{stock.cover}}"></a>
+</div>
+{% endfor %}
+<form action="{{ url_for('stock',id=stock_id) }}" method="post" name="Buy_stock">
+      {{ form.csrf_token }}
+      <p>
+          {{ form.num.label }}<br>
+          {{ form.num(size=80) }}<br>
+      </p>
+      <p><input type="submit" value="Buy"></p>
+</form>
+{% endblock %}
