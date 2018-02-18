@@ -1,19 +1,131 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Hi, {{user}}!</h1>
+{% extends "base.html" %} {% block content %}
+<script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+<script src="{{ url_for('static', filename='vue.min.js') }}"></script>
+
 {% for stock in stocks %}
 <div>
-    <p>{{stock.name}}<br> price: {{stock.price}}<br>totle: {{stock.total}}<b>
+    <p>{{stock.name}}
+        <br> price: {{stock.price}}
+        <br>totle: {{stock.total}}<b>
     </p>
     <a href="{{stock.cover}}"></a>
 </div>
 {% endfor %}
-<form action="{{ url_for('stock',id=stock_id) }}" method="post" name="Buy_stock">
-      {{ form.csrf_token }}
-      <p>
-          {{ form.num.label }}<br>
-          {{ form.num(size=80) }}<br>
-      </p>
-      <p><input type="submit" value="Buy"></p>
-</form>
+
+
+<div id="order_Selling">
+<p>卖单：</p>
+  <ol>
+  <li v-for="iter in msg">数量： [[ iter.stock_number ]] 价格：[[iter.stock_price]]
+  </li>
+  </ol>
+</div>
+
+<div id="order_Buying">
+<p>买单：</p>
+  <ol>
+  <li v-for="iter in msg">数量： [[ iter.stock_number ]] 价格：[[iter.stock_price]]
+  </li>
+  </ol>
+</div>
+
+<div id="order_submit">
+    <button v-on:click="show = !show, order_type = 1">
+    买单
+    </button>
+    <button v-on:click="show = !show, order_type = 2">
+    卖单
+    </button><br>
+<input v-model="stock_number" placeholder="stock_number" v-if="show"><br>
+<input v-model="stock_price" placeholder="stock_price" v-if="show">
+<button v-on:click="submit" v-if="show">确认</button>
+<p>[[ message ]]</p>
+
+
+</div>
+<script>
+
+var order_Buying = new Vue({
+  el: '#order_Buying',
+  data: {
+    msg:  '',
+    stock_number:'',
+    stock_price:''
+
+  },
+    delimiters: ['[[',']]'],
+    created: function(){
+         axios.get('/api/stock/',{params:{id:getQueryString("id"),type:1}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Buying.msg = response.data.body });
+    },
+    methods: {
+        update:function(){
+            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:1}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Buying.msg = response.data.body });
+
+        }
+    }
+});
+var order_Selling = new Vue({
+  el: '#order_Selling',
+  data: {
+    msg:  '',
+    stock_number:'',
+    stock_price:''
+
+  },
+    delimiters: ['[[',']]'],
+    created: function(){
+        axios.get('/api/stock/',{
+            params:{
+                id:getQueryString("id"),
+                type:2}}).then(function(response) {
+                 console.log(response.data);
+                 console.log(response.status);
+                 console.log(response.statusText);
+                 console.log(response.headers);
+                 console.log(response.config);
+                 order_Selling.msg = response.data.body 
+                  });
+    },
+    methods: {
+        update:function(){
+            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:2}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Buying.msg = response.data.body });
+
+        }
+    }
+});
+var order_submit = new Vue({
+    el:'#order_submit',
+    data:{
+        stock_number: '',
+        stock_price: '',
+        message: '',
+        show: false,
+        order_type: 0,
+    },
+    methods:{
+        submit: function () {
+            axios.post('/api/order_submit/',{
+                stock_id:getQueryString("id"),
+                order_number:order_submit.stock_number,
+                order_price:order_submit.stock_price,
+                order_type:order_submit.order_type
+            }).then(function(response){
+                console.log(response.data),
+                order_submit.message = response.data.msg
+            })
+        }
+    },
+    delimiters: ['[[',']]'],
+});
+
+
+
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+    }
+
+
+</script>
 {% endblock %}

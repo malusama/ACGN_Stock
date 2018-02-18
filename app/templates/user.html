@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>用户:{{user.nickname}}</h1>
+
+{% for stock in user_stock %}
+<div>
+     stock_name: <a href="/stock/?id={{stock.stock_id}}">{{stock.name}}</a>
+     stock_number: {{stock.stock_number}}<b>
+    </p>
+    <a href="{{stock.cover}}"></a>
+</div>
+{% endfor %}
+
+
+
+
+{% endblock %}

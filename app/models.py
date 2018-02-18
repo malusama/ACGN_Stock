@@ -19,6 +19,7 @@ class User(Base):
     created_at = Column(DateTime, nullable=False,
                         default=datetime.datetime.now)
     posts = relationship('Post', backref='author', lazy='dynamic')
+    stocks = relationship('Bank', backref='user_name', lazy='dynamic')
 
     def __repr__(self):
         return '<User %r>' % (self.nickname)
@@ -46,15 +47,27 @@ class Stock(Base):
     price = Column(Integer, default=None, nullable=False)
     introduction = Column(Text, default='')
     cover = Column(String(255), default=None)
+    banks = relationship('Bank', backref='stock', lazy='dynamic')
 
 
 class Bank(Base):
     __tablename__ = 'bank'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(String(255), default=None)
-    stock_id = Column(String(255), default=None)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    stock_id = Column(Integer, ForeignKey('stock.id'))
     stock_number = Column(String(255), default=None)
+
+
+class Stock_order(Base):
+    __tablename__ = 'stock_order'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    stock_id = Column(Integer, ForeignKey('stock.id'))
+    stock_number = Column(String(255), default=None)
+    stock_type = Column(Integer, nullable=False)
+    stock_price = Column(Integer, nullable=False)
 
 
 engine = create_engine(

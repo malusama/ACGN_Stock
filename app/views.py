@@ -12,7 +12,7 @@ from flask import (
     session,
     url_for,
     request,
-    g,
+    jsonify,
 )
 from .forms import LoginForm, Register, Buy_stock
 
@@ -26,7 +26,7 @@ def index():
         username = 'None'
     return render_template('index.html',
                            title='ACGN Stock Change',
-                           user=username,
+                           username=username,
                            posts=handle.get_post())
 
 
@@ -80,7 +80,7 @@ def stock_change():
     stock = handle.get_stock()
     return render_template('stock_change.html',
                            title='Stock Change',
-                           user=session['username'],
+                           username=session['username'],
                            stocks=stock)
 
 
@@ -89,6 +89,7 @@ def stock():
     form = Buy_stock()
     id = request.args.get('id')
     stock_info = handle.get_stock(id)
+    stock_order_buy = handle.get_stock_order(stock_id=id, order_type=1)
     if form.validate_on_submit():
         number = request.form.get('num', None)
         status = handle.buy_stock(
@@ -105,11 +106,64 @@ def stock():
             stocks=stock_info,
             form=form,
             stock_id=request.args.get('id'),
-            user=session['username'])
+            username=session['username'],
+            stock_order_buy=stock_order_buy)
     else:
         return redirect(url_for('index'))
 
 
+@app.route('/api/stock/', methods=['GET'])
+def get_stock_order():
+    stock_id = request.args.get('id')
+    order_type = request.args.get('type')
+    app.logger.info('id:,type:'.format(stock_id, order_type))
+    return jsonify({
+        "msg": "tset",
+        "body": handle.get_stock_order(
+            stock_id=stock_id,
+            order_type=order_type)
+    })
+
+
+@app.route('/api/order_submit/', methods=['POST'])
+def order_submit():
+    status = handle.buy_stock(
+        stock_id=request.get_json().get('stock_id'),
+        order_number=request.get_json().get('order_number'),
+        order_price=request.get_json().get('order_price'),
+        user_name=session['username'],
+        order_type=request.get_json().get('order_type')
+    )
+    msg = 0
+    if status == 1:
+        msg = '购买成功'
+    if status == 2:
+        msg = '出售成功'
+    if status == -1:
+        msg = ' 则是卖方市场没有匹配到合适的价格 挂到市场'
+    if status == -3:
+        msg = '请求的参数错误'
+    app.logger.info(
+        "stock_id:{},order_number:{},order_price:{},order_type:{}".format(
+            request.get_json().get('stock_id'),
+            request.get_json().get('order_number'),
+            request.get_json().get('order_price'),
+            request.get_json().get('order_type'),
+        ))
+    return jsonify({
+        'msg': msg,
+        'body': request.get_json()
+    })
+
+
 @app.route('/user/', methods=['GET', 'POST'])
 def user():
-    pass
+    id = request.args.get('id')
+    user, user_stock = handle.get_user_stock(id)
+    if user:
+        return render_template('user.html',
+                               username=user.nickname,
+                               user=user,
+                               user_stock=user_stock)
+    else:
+        return redirect(url_for('index'))

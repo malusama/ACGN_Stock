@@ -7,7 +7,7 @@ CREATE TABLE users (
     nickname          VARCHAR(255)                  NOT NULL,
     password          VARCHAR(255)                  NOT NULL,
     email             VARCHAR(255)                  DEFAULT NULL UNIQUE,
-   	currency          INTEGER                       DEFAULT NULL,
+    currency          INTEGER                       DEFAULT NULL,
     updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
@@ -28,14 +28,12 @@ CREATE TABLE posts (
 -- TABLE: stock
 --
 CREATE TABLE stock (
-	id                SERIAL PRIMARY KEY,
-	name              VARCHAR(255)                  NOT NULL UNIQUE,
-	Total             INTEGER                       DEFAULT NULL NOT NULL,
-	Price             INTEGER                       DEFAULT NULL NOT NULL,
-	Introduction      TEXT                          DEFAULT NULL,
-	cover             VARCHAR(255)                  DEFAULT NULL,
-	image             VARCHAR(255)                  DEFAULT NULL,
-	created_at        TIMESTAMP                     DEFAULT now() NOT NULL
+    id                SERIAL PRIMARY KEY,
+    name              VARCHAR(255)                  NOT NULL UNIQUE,
+    Introduction      TEXT                          DEFAULT NULL,
+    cover             VARCHAR(255)                  DEFAULT NULL,
+    image             VARCHAR(255)                  DEFAULT NULL,
+    created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
 
 
@@ -43,9 +41,23 @@ CREATE TABLE stock (
 -- TABLE: bank
 --
 CREATE TABLE bank (
-	id                SERIAL PRIMARY KEY,
-	user_id           VARCHAR(255)                  NOT NULL,
-	stock_id          VARCHAR(255)                  NOT NULL,
-	stock_number      VARCHAR(255)                  NOT NULL,
-	created_at        TIMESTAMP                     DEFAULT now() NOT NULL
+    id                SERIAL PRIMARY KEY,
+    user_id           INTEGER                       NOT NULL,
+    stock_id          INTEGER                       NOT NULL,
+    stock_number      INTEGER                       NOT NULL,
+    created_at        TIMESTAMP                     DEFAULT now() NOT NULL
+);
+
+
+--
+-- TABLE: stock_order
+--
+CREATE TABLE stock_order (
+    id                SERIAL PRIMARY KEY,
+    user_id           INTEGER                       NOT NULL,
+    stock_id          INTEGER                       NOT NULL,
+    stock_number      INTEGER                       NOT NULL,
+    stock_price       INTEGER                       NOT NULL,
+    order_type        INTEGER                       NOT NULL,
+    created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
