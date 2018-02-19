@@ -71,6 +71,11 @@ def buy_stock(stock_id=None, order_number=None,
             ).order_by(models.Stock_order.stock_price).first()
             user = session.query(models.User).filter(
                 models.User.nickname == user_name).first()
+
+            bank = session.query(models.Bank).filter(
+                models.Bank.user_id == user.id,
+                models.Bank.stock_id == stock_id).first()
+
             if user.currency < int(order_number) * int(order_price) * Tax:
                 return "用户所拥有的代币不足够完成操作"
             if stock_order is None:
@@ -83,7 +88,7 @@ def buy_stock(stock_id=None, order_number=None,
                     stock_type=1)
                 session.add(sub)
                 session.commit()
-                return "购买成功"
+                return "提交订单成功"
             if stock_order.stock_price <= order_price:
                 if stock_order.stock_number <= order_number:
                     while order_number > 0:
@@ -100,6 +105,15 @@ def buy_stock(stock_id=None, order_number=None,
                             order_number = order_number - \
                                 stock_order.stock_number
                             session.delete(stock_order)
+                            if bank:
+                                sub = models.Bank(
+                                    user_id=user.id,
+                                    stock_id=stock_id,
+                                    stock_number=stock_order.stock_number)
+                                session.add(sub)
+                            else:
+                                bank.stock_number = bank.stock_number + \
+                                    stock_order.stock_number
                             session.commit()
                             stock_order = session.query(
                                 models.Stock_order).filter(
@@ -119,6 +133,15 @@ def buy_stock(stock_id=None, order_number=None,
 
                             stock_order.stock_number = \
                                 stock_order.stock_number - order_number
+                            if bank:
+                                sub = models.Bank(
+                                    user_id=user.id,
+                                    stock_id=stock_id,
+                                    stock_number=order_number)
+                                session.add(sub)
+                            else:
+                                bank.stock_number = bank.stock_number + \
+                                    order_number
                             session.commit()
                             order_number = 0
                         else:
@@ -159,6 +182,14 @@ def buy_stock(stock_id=None, order_number=None,
             # 买方市场订单
             user = session.query(models.User).filter(
                 models.User.nickname == user_name).first()
+            bank = session.query(models.Bank).filter(
+                models.Bank.user_id == user.id,
+                models.Bank.stock_id == stock_id).first()
+            if bank is None or bank.stock_number < int(order_number):
+                return "用户所拥有的股票数不够"
+            else:
+                bank.stock_number = bank.stock_number - order_number
+                session.commit()
             if stock_order is None:
                 # 如果买方市场没有订单 则直接提交至挂单
                 sub = models.Stock_order(
@@ -170,11 +201,7 @@ def buy_stock(stock_id=None, order_number=None,
                 session.add(sub)
                 session.commit()
                 return "出售成功"
-            bank = session.query(models.Bank).filter(
-                models.Bank.user_id == user.id,
-                models.Bank.stock_id == stock_id).first()
-            if bank is None or bank.stock_number < int(order_number):
-                return "用户所拥有的股票数不够"
+
             if stock_order.stock_price >= int(order_price):
                 # 如果买方市场的价格高于当前出售价格
                 if stock_order.stock_number < int(order_number):
@@ -241,6 +268,8 @@ def buy_stock(stock_id=None, order_number=None,
                         (order_number * order_price * Tax)
                     stock_order.stock_number = \
                         stock_order.stock_number - order_number
+                    if stock_order.stock_number == 0:
+                        session.delete(stock_order)
                     session.commit()
                     return "出售成功"
             else:
@@ -326,3 +355,10 @@ def get_stock_order(stock_id=None, user_id=None, order_type=None):
                 temp['stock_price'] = iter.stock_price
                 stock_order.append(temp)
             return stock_order
+
+
+def get_stock_cover(stock_id):
+    session = models.DBSession()
+    cover = session.query(models.Stock).filter(
+        models.Stock.id == stock_id).first()
+    return cover.cover

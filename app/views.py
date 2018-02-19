@@ -105,6 +105,7 @@ def stock():
             'stock.html',
             stocks=stock_info,
             form=form,
+            image=handle.get_stock_cover(request.args.get('id')),
             stock_id=request.args.get('id'),
             username=session['username'],
             stock_order_buy=stock_order_buy)
