@@ -16,7 +16,7 @@
 <div id="order_Selling">
 <p>卖单：</p>
   <ol>
-  <li v-for="iter in msg">数量： [[ iter.stock_number ]] 价格：[[iter.stock_price]]
+  <li v-for="iter in msg" v-model="msg">数量： [[ iter.stock_number ]] 价格：[[iter.stock_price]]
   </li>
   </ol>
 </div>
@@ -24,7 +24,7 @@
 <div id="order_Buying">
 <p>买单：</p>
   <ol>
-  <li v-for="iter in msg">数量： [[ iter.stock_number ]] 价格：[[iter.stock_price]]
+  <li v-for="iter in msg" v-model="msg">数量： [[ iter.stock_number ]] 价格：[[iter.stock_price]]
   </li>
   </ol>
 </div>
@@ -88,7 +88,7 @@ var order_Selling = new Vue({
     },
     methods: {
         update:function(){
-            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:2}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Buying.msg = response.data.body });
+            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:2}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Selling.msg = response.data.body });
 
         }
     }
@@ -111,7 +111,9 @@ var order_submit = new Vue({
                 order_type:order_submit.order_type
             }).then(function(response){
                 console.log(response.data),
-                order_submit.message = response.data.msg
+                order_submit.message = response.data.msg,
+                order_Selling.update(),
+                order_Buying.update()
             })
         }
     },

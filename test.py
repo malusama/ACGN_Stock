@@ -29,8 +29,18 @@ def buy_stock(stock_id=None, order_number=None,
             user = session.query(models.User).filter(
                 models.User.nickname == user_name).first()
             if user.currency < order_number * order_price * Tax:
-                return -2
-                # 返回-2 是用户所拥有的代币不足够完成操作
+                return "用户所拥有的代币不足够完成操作"
+            if stock_order is None:
+                # 如果卖方市场没有订单 则直接提交至挂单
+                sub = models.Stock_order(
+                    user_id=user.id,
+                    stock_id=stock_id,
+                    stock_number=order_number,
+                    stock_price=order_price,
+                    stock_type=1)
+                session.add(sub)
+                session.commit()
+                return "购买成功"
             if stock_order.stock_price <= order_price:
                 if stock_order.stock_number <= order_number:
                     while order_number > 0:
@@ -78,12 +88,14 @@ def buy_stock(stock_id=None, order_number=None,
                             session.add(sub)
                             session.commit()
                             order_number = 0
+                    return "购买成功"
                 else:
                     user.currency = user.currency - \
                         (order_number * order_price * Tax)
                     stock_order.stock_number = \
                         stock_order.stock_number - order_number
                     session.commit()
+                    return "购买成功"
             else:
                 sub = models.Stock_order(
                     user_id=user.id,
@@ -95,19 +107,35 @@ def buy_stock(stock_id=None, order_number=None,
                     (order_number * order_price * Tax)
                 session.add(sub)
                 session.commit()
-                return -1
-                # 返回结果是-1 则是卖方市场没有匹配到合适的价格 挂到市场
+                return "卖方市场没有匹配到合适的价格 挂到市场"
         elif order_type == 2:
             stock_order = session.query(models.Stock_order).filter(
                 models.Stock_order.stock_id == stock_id,
                 models.Stock_order.stock_type == 1
             ).order_by(-models.Stock_order.stock_price).first()
-
+            # 买方市场订单
             user = session.query(models.User).filter(
                 models.User.nickname == user_name).first()
-
+            if stock_order is None:
+                # 如果买方市场没有订单 则直接提交至挂单
+                sub = models.Stock_order(
+                    user_id=user.id,
+                    stock_id=stock_id,
+                    stock_number=order_number,
+                    stock_price=order_price,
+                    stock_type=2)
+                session.add(sub)
+                session.commit()
+                return "出售成功"
+            bank = session.query(models.Bank).filter(
+                models.Bank.user_id == user.id,
+                models.Bank.stock_id == stock_id).first()
+            if bank is None or bank.stock_number < order_number:
+                return "用户所拥有的股票数不够"
             if stock_order.stock_price >= order_price:
+                # 如果买方市场的价格高于当前出售价格
                 if stock_order.stock_number < order_number:
+                    # 如果买方市场的订单数量不够
                     while order_number > 0:
                         if stock_order and \
                                 stock_order.stock_price >= order_price and \
@@ -164,19 +192,30 @@ def buy_stock(stock_id=None, order_number=None,
                             session.add(sub)
                             session.commit()
                             order_number = 0
+                    return "出售成功"
                 else:
                     user.currency = user.currency + \
                         (order_number * order_price * Tax)
                     stock_order.stock_number = \
                         stock_order.stock_number - order_number
                     session.commit()
+                    return "出售成功"
+            else:
+                sub = models.Stock_order(
+                    user_id=user.id,
+                    stock_id=stock_id,
+                    stock_number=order_number,
+                    stock_price=order_price,
+                    stock_type=2)
+                session.add(sub)
+                session.commit()
+                return "出售成功"
         else:
-            return -3
-            # 返回-3 是请求的参数错误
+            return '请求的参数错误'
 
 
 def run():
-
+    '''
     for iter in range(1, 5):
         tset_data(user_id=3, stock_id=2, stock_number=1,
                   stock_type=1, stock_price=iter)
@@ -186,9 +225,11 @@ def run():
                   stock_type=2, stock_price=10 - iter)
         tset_data(user_id=3, stock_id=1, stock_number=1,
                   stock_type=2, stock_price=10 - iter)
-
-    # buy_stock(stock_id=2, order_number=7,
-    #          order_price=6, user_name='admin', order_type=1)
+    '''
+    # tset_data(user_id=3, stock_id=2, stock_number=5,
+    #          stock_type=1, stock_price=5)
+    print(buy_stock(stock_id=2, order_number=2,
+                    order_price=2, user_name='admin', order_type=2))
     '''
     session = models.DBSession()
     order = session.query(models.Stock_order).filter(
@@ -200,7 +241,4 @@ def run():
 
 
 if __name__ == '__main__':
-    # run()
-    test = '131'
-    test = int(test)
-    print(test)
+    run()

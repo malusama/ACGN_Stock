@@ -127,22 +127,13 @@ def get_stock_order():
 
 @app.route('/api/order_submit/', methods=['POST'])
 def order_submit():
-    status = handle.buy_stock(
+    msg = handle.buy_stock(
         stock_id=request.get_json().get('stock_id'),
         order_number=request.get_json().get('order_number'),
         order_price=request.get_json().get('order_price'),
         user_name=session['username'],
         order_type=request.get_json().get('order_type')
     )
-    msg = 0
-    if status == 1:
-        msg = '购买成功'
-    if status == 2:
-        msg = '出售成功'
-    if status == -1:
-        msg = ' 则是卖方市场没有匹配到合适的价格 挂到市场'
-    if status == -3:
-        msg = '请求的参数错误'
     app.logger.info(
         "stock_id:{},order_number:{},order_price:{},order_type:{}".format(
             request.get_json().get('stock_id'),
