@@ -1,8 +1,0 @@
-<form action="{{ url_for('stock',id=stock_id) }}" method="post" name="Buy_stock">
-      {{ form.csrf_token }}
-      <p>
-          {{ form.num.label }}<br>
-          {{ form.num(size=80) }}<br>
-      </p>
-      <p><input type="submit" value="Buy"></p>
-</form>

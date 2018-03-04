@@ -3,7 +3,8 @@
 {% extends "base.html" %}
 {% block content %}
 {% for stock in stocks %}
-<div style="border:1px solid #000;width:200px;height:220px" onclick="sclick({{stock.id}})">
+<div style="border-style: solid; display: inline-block;border-width: 1px;width: 200px;" onclick="sclick({{stock.id}})">
+	<img src={{ stock.cover }}  alt={{stock.name}} />
     <p>{{stock.name}} price: {{stock.price}}<br>total: {{stock.total}}
     </p>
 </div>
