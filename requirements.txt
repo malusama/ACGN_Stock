@@ -1,0 +1,6 @@
+Flask==0.11
+SQLAlchemy==1.0.14
+flask-docjson==0.1.7
+redis==2.10.5
+requests==2.11.1
+pyquery==1.3.0
