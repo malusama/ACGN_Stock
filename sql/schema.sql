@@ -8,6 +8,7 @@ CREATE TABLE users (
     password          VARCHAR(255)                  NOT NULL,
     email             VARCHAR(255)                  DEFAULT NULL UNIQUE,
     currency          INTEGER                       DEFAULT NULL,
+    Authority         INTEGER                       DEFAULT NULL,
     updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
@@ -34,6 +35,7 @@ CREATE TABLE stock (
     cover             VARCHAR(255)                  DEFAULT NULL,
     image             VARCHAR(255)                  DEFAULT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
+    user_id           VARCHAR(255)                  DEFAULT NULL
 );
 
 
@@ -59,5 +61,20 @@ CREATE TABLE stock_order (
     stock_number      INTEGER                       NOT NULL,
     stock_price       INTEGER                       NOT NULL,
     order_type        INTEGER                       NOT NULL,
+    created_at        TIMESTAMP                     DEFAULT now() NOT NULL
+);
+
+
+--
+-- TABLE: stock_apply
+--
+CREATE TABLE stock_apply (
+    id                SERIAL PRIMARY KEY,
+    user_id           INTEGER                       NOT NULL,
+    apply_status      INTEGER                       NOT NULL,
+    stock_name        VARCHAR(255)                  NOT NULL UNIQUE,
+    cover             VARCHAR(255)                  DEFAULT NULL,
+    image             VARCHAR(255)                  DEFAULT NULL,
+    Introduction      TEXT                          DEFAULT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );

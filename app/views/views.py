@@ -14,7 +14,7 @@ from app.forms import (
     Buy_stock
 )
 from app.handlers import (
-    handle
+    handle,
 )
 
 
@@ -162,3 +162,50 @@ def user():
                                user_stock=user_stock)
     else:
         return redirect(url_for('index'))
+
+
+@app.route('/stock_apply/', methods=['GET'])
+def stock_apply():
+    if 'username' in session:
+        username = session['username']
+    else:
+        username = None
+    return render_template('stock_apply.html', username=username)
+
+
+@app.route('/api/stock_apply/', methods=['POST'])
+def stock_apply_submit():
+    print(request.get_json())
+    try:
+        msg = handle.stock_apply(user_id=request.get_json().get('user_id'),
+                                 stock_name=request.get_json().get('stock_name'),
+                                 stock_image=request.get_json().get('stock_image'),
+                                 stock_cover=request.get_json().get('stock_cover'),
+                                 stock_introduction=request.get_json().get('stock_introduction'),
+                                 apply_status=0)
+    except ValueError:
+        msg = '输入参数异常'
+
+    return jsonify({
+        "msg": msg
+    })
+
+
+@app.route('/api/user_id/', methods=['GET'])
+def get_userid():
+    if 'username' in session:
+        username = session['username']
+        userid = handle.get_userid(username)
+        msg = 'ok'
+        return jsonify({
+            "msg": msg,
+            "userid": userid
+        })
+
+    else:
+        username = 'None'
+        msg = '没有用户'
+        return jsonify({
+            "msg": msg,
+            "userid": username
+        })

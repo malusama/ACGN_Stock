@@ -16,6 +16,7 @@ class User(Base):
     password = Column(String(255))
     email = Column(String(255), unique=True)
     currency = Column(String(255), default='1000')
+    authority = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, nullable=False,
                         default=datetime.datetime.now)
     posts = relationship('Post', backref='author', lazy='dynamic')
@@ -68,6 +69,18 @@ class Stock_order(Base):
     stock_number = Column(String(255), default=None)
     stock_type = Column(Integer, nullable=False)
     stock_price = Column(Integer, nullable=False)
+
+
+class Stock_apply(Base):
+    __tablename__ = 'stock_apply'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    apply_status = Column(Integer, nullable=False)
+    stock_name = Column(String(255), default=None)
+    cover = Column(String(255), default=None)
+    image = Column(String(255), default=None)
+    introduction = Column(Text, default='')
 
 
 engine = create_engine(
