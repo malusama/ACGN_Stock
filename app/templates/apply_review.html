@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+<script src="{{ url_for('static', filename='vue.min.js') }}"></script>
+
+
+<div id='apply_review'>
+	<li v-for='iter in json'>
+		名字:[[ iter.stock_name ]]
+		图片:[[ iter.stock_image ]]
+		封面:[[ iter.stock_cover ]]
+	</li>	
+</div>
+<script>
+
+var apply_review = new Vue({
+	el: '#apply_review',
+	data: {
+		json: 'test'
+	},
+	delimiters: ['[[',']]'],
+	created: function(){
+		axios.get("/api/get_apply/").then(function(response){
+			console.log(response.data.json),
+			apply_review.json = response.data.json
+
+		});
+	}
+});
+
+</script>
+{% endblock %}

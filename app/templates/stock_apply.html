@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+<script src="{{ url_for('static', filename='vue.min.js') }}"></script>
+<div id='stock_apply'>
+Stock name:<br>
+<input v-model='stock_name' type="text" name="Stockname">
+<br>
+cover:<br>
+<input v-model='stock_cover' type="text" name="cover">
+<br>
+image:<br>
+<input v-model='stock_image' type="text" name="image">
+<br>
+Introduction:<br>
+<textarea v-model='stock_introduction' rows="3" cols="20">
+</textarea>
+<br>
+<button v-on:click='submit'>确认</button>
+
+</div>
+
+
+
+<script>
+var stock_apply = new Vue({
+	el: '#stock_apply',
+	data: {
+		stock_name: '',
+		stock_cover: '',
+		stock_image: '',
+		stock_introduction: '',
+		user_id: ''
+	},
+	delimiters: ['[[',']]'],
+    created: function(){
+        axios.get('/api/user_id/').then(function(response) {
+                 console.log(response.data);
+                 stock_apply.user_id = response.data.userid
+                  });
+    },
+	methods:{
+		submit:function(){
+		axios.post('/api/stock_apply/',{
+			stock_name:stock_apply.stock_name,
+			stock_cover:stock_apply.stock_cover,
+			stock_image:stock_apply.stock_image,
+			stock_introduction:stock_apply.stock_introduction,
+			user_id:stock_apply.user_id
+
+		}).then(function(response){
+			console.log(response.data)
+		})
+	}}
+
+});
+</script>
+{% endblock %}
