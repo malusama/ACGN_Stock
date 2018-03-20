@@ -395,3 +395,32 @@ def get_userid(username):
         return "没有用户"
     else:
         return str(user.id)
+
+
+def get_user_authority(username):
+    if not username:
+        raise ValueError
+    session = DBSession()
+    user = session.query(User).filter(User.nickname == username).first()
+    if not user:
+        return "没有用户"
+    else:
+        return str(user.authority)
+
+
+def get_apply():
+    session = DBSession()
+    stock_apply = session.query(Stock_apply).all()
+    res = []
+    if stock_apply:
+        for iter in stock_apply:
+            temp = {}
+            temp['id'] = iter.id
+            temp['user_id'] = iter.user_id
+            temp['stock_name'] = iter.stock_name
+            temp['stock_image'] = iter.image
+            temp['stock_cover'] = iter.cover
+            temp['stock_introduction'] = iter.introduction
+            temp['apply_status'] = iter.apply_status
+            res.append(temp)
+    return res

@@ -23,11 +23,14 @@ from app.handlers import (
 def index():
     if 'username' in session:
         username = session['username']
+        user_authority = handle.get_user_authority(username)
     else:
         username = 'None'
+    print(user_authority)
     return render_template('index.html',
                            title='ACGN Stock Change',
                            username=username,
+                           user_authority=user_authority,
                            posts=handle.get_post())
 
 
@@ -209,3 +212,43 @@ def get_userid():
             "msg": msg,
             "userid": username
         })
+
+
+@app.route('/api/user_id_authority/', methods=['GET'])
+def get_userid_authority():
+    if 'username' in session:
+        username = session['username']
+        user_authority = handle.get_user_authority(username)
+        msg = 'ok'
+        return jsonify({
+            "msg": msg,
+            "user_id_authority": user_authority
+        })
+
+    else:
+        user_authority = 'None'
+        msg = '没有用户'
+        return jsonify({
+            "msg": msg,
+            "user_authority": user_authority
+        })
+
+
+@app.route('/apply_review/', methods=['GET'])
+def apply_review():
+    if 'username' in session:
+        username = session['username']
+        user_authority = handle.get_user_authority(username)
+    else:
+        username = None
+    return render_template('apply_review.html',
+                           username=username,
+                           user_authority=user_authority)
+
+
+@app.route('/api/get_apply/', methods=['GET'])
+def get_apply():
+    stock_apply = handle.get_apply()
+    return jsonify({
+        "json": stock_apply
+    })

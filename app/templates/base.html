@@ -12,8 +12,10 @@
         {% if 'username' in session %}
             <a href="{{ url_for('logout') }}">sign out</a>
             <a href="{{ url_for('stock_change') }}">stock_change</a>
-            
-
+            <a href="{{ url_for('stock_apply') }}">stock_apply</a>
+            {% if user_authority == "1" %}
+                <a href="{{ url_for('apply_review') }}">apply_review</a>
+            {% endif %}
             用户:
             <a href="{{ url_for('user',id=username) }}">{{username}}</a>
 
