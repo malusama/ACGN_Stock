@@ -327,9 +327,11 @@ def get_user_stock(username=None):
                 temp['name'] = iter.stock.name
                 user_stock.append(temp)
             return user, user_stock
+        else:
+            return user, []
 
     else:
-        return None
+        return None, None
 
 
 def get_stock_order(stock_id=None, user_id=None, order_type=None):
@@ -432,11 +434,18 @@ def review_pass(stock_id):
         review_stock = session.query(Stock_apply).filter(
             Stock_apply.id == stock_id).first()
         if review_pass:
+            stock_name = review_pass.stock_name
+            user_id = review_pass.user_id
             sub = Stock(name=review_stock.stock_name,
                         cover=review_stock.cover,
                         introduction=review_stock.introduction)
             session.add(sub)
             session.delete(review_stock)
+            session.commit()
+
+            stock = session.query(Stock).filter(name=stock_name).first()
+            sub = Bank(user_id=user_id, stock_id=stock.id, stock_number=1000)
+            session.add(sub)
             session.commit()
             return "成功"
         else:
