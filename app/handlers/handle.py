@@ -56,7 +56,7 @@ def get_stock(id=None):
         temp['total'] = iter.total
         temp['price'] = iter.price
         temp['introduction'] = iter.introduction
-        temp['cover'] = 'http://{}'.format(iter.cover)
+        temp['cover'] = '{}'.format(iter.cover)
         stock.append(temp)
     session.close()
     return stock
@@ -424,3 +424,22 @@ def get_apply():
             temp['apply_status'] = iter.apply_status
             res.append(temp)
     return res
+
+
+def review_pass(stock_id):
+    if stock_id:
+        session = DBSession()
+        review_stock = session.query(Stock_apply).filter(
+            Stock_apply.id == stock_id).first()
+        if review_pass:
+            sub = Stock(name=review_stock.stock_name,
+                        cover=review_stock.cover,
+                        introduction=review_stock.introduction)
+            session.add(sub)
+            session.delete(review_stock)
+            session.commit()
+            return "成功"
+        else:
+            raise ValueError
+    else:
+        raise ValueError

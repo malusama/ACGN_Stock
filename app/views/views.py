@@ -26,7 +26,7 @@ def index():
         user_authority = handle.get_user_authority(username)
     else:
         username = 'None'
-    print(user_authority)
+        user_authority = 0
     return render_template('index.html',
                            title='ACGN Stock Change',
                            username=username,
@@ -111,7 +111,7 @@ def stock():
             stocks=stock_info,
             form=form,
             image="{}{}".format(
-                "http://", handle.get_stock_cover(request.args.get('id'))),
+                "", handle.get_stock_cover(request.args.get('id'))),
             stock_id=request.args.get('id'),
             username=session['username'],
             stock_order_buy=stock_order_buy)
@@ -252,3 +252,23 @@ def get_apply():
     return jsonify({
         "json": stock_apply
     })
+
+
+@app.route('/api/apple_pass/', methods=['POST'])
+def apple_pass():
+    if 'username' in session:
+        username = session['username']
+        user_authority = handle.get_user_authority(username)
+        if user_authority == "1":
+            msg = handle.review_pass(request.get_json().get('id'))
+            return jsonify({
+                "msg": msg
+            })
+        else:
+            return jsonify({
+                "msg": "用户权限不够"
+            })
+    else:
+        return jsonify({
+            "msg": "用户不存在"
+        })

@@ -4,8 +4,8 @@
 {% block content %}
 {% for stock in stocks %}
 <div style="border-style: solid; display: inline-block;border-width: 1px;width: 200px;" onclick="sclick({{stock.id}})">
-	<img src={{ stock.cover }}  alt={{stock.name}} />
-    <p>{{stock.name}} price: {{stock.price}}<br>total: {{stock.total}}
+	<img src={{ stock.cover }}  alt={{stock.name}} height="250" width="180" />
+    <p>{{stock.name}}
     </p>
 </div>
 {% endfor %}
