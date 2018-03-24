@@ -34,8 +34,9 @@ CREATE TABLE stock (
     Introduction      TEXT                          DEFAULT NULL,
     cover             VARCHAR(255)                  DEFAULT NULL,
     image             VARCHAR(255)                  DEFAULT NULL,
+    user_id           VARCHAR(255)                  DEFAULT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
-    user_id           VARCHAR(255)                  DEFAULT NULL
+
 );
 
 

@@ -44,8 +44,6 @@ class Stock(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(Text, unique=True, nullable=False)
-    total = Column(Integer, default=None, nullable=False)
-    price = Column(Integer, default=None, nullable=False)
     introduction = Column(Text, default='')
     cover = Column(String(255), default=None)
     banks = relationship('Bank', backref='stock', lazy='dynamic')
@@ -67,7 +65,7 @@ class Stock_order(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     stock_id = Column(Integer, ForeignKey('stock.id'))
     stock_number = Column(String(255), default=None)
-    stock_type = Column(Integer, nullable=False)
+    order_type = Column(Integer, nullable=False)
     stock_price = Column(Integer, nullable=False)
 
 

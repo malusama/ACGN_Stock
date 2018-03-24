@@ -53,8 +53,8 @@ def get_stock(id=None):
         temp = {}
         temp['id'] = iter.id
         temp['name'] = iter.name
-        temp['total'] = iter.total
-        temp['price'] = iter.price
+        # temp['total'] = iter.total
+        # temp['price'] = iter.price
         temp['introduction'] = iter.introduction
         temp['cover'] = '{}'.format(iter.cover)
         stock.append(temp)
@@ -356,7 +356,7 @@ def get_stock_order(stock_id=None, user_id=None, order_type=None):
             stock_order_index = session.query(
                 Stock_order).filter(
                 Stock_order.stock_id == stock_id,
-                Stock_order.stock_type == order_type).all()
+                Stock_order.order_type == order_type).all()
             for iter in stock_order_index:
                 temp = {}
                 temp['user_id'] = iter.user_id
