@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy import create_engine, ForeignKey
 import datetime
-
+import json
 # 创建对象的基类:
 Base = declarative_base()
 
@@ -47,6 +47,15 @@ class Stock(Base):
     introduction = Column(Text, default='')
     cover = Column(String(255), default=None)
     banks = relationship('Bank', backref='stock', lazy='dynamic')
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'introduction': self.introduction,
+            'cover': self.cover,
+            'cover': self.cover,
+        }
 
 
 class Bank(Base):

@@ -1,24 +1,34 @@
 <script type="text/javascript" src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>  
-
 {% extends "base.html" %}
 {% block content %}
-{% for stock in stocks %}
-<div style="border-style: solid; display: inline-block;border-width: 1px;width: 200px;" onclick="sclick({{stock.id}})">
-	<img src={{ stock.cover }}  alt={{stock.name}} height="250" width="180" />
-    <p>{{stock.name}}
-    </p>
+
+<div id="stock" >
+	<div v-for="iter in stock_json" style="border-style: solid; display: inline-block;border-width: 1px;width: 200px;" v-on:click="update(iter.id)">
+		<img :src="iter.cover">
+		<p>[[ iter.name ]]</p>
+	</div>
 </div>
-{% endfor %}
 
 <script>  
-function sclick(id){  
-    window.location.href='./stock/?id='+id;
-}  
-$('#oo').bind('click',function(event){
-    alert('im a');
-    event.stopPropagation();
-
+var stock = new Vue({
+  el: '#stock',
+  data: {
+    msg:  '',
+    stock_json:'',
+  },
+    delimiters: ['[[',']]'],
+    created: function(){
+         axios.get('/api/stock_change/',{params:{limit:45, offset:0}}).then(function(response) { 
+         	stock.msg = response.data.msg
+         	stock.stock_json = response.data.stock});
+    },
+    methods: {
+        update:function sclick(id){  
+    		window.location.href='./stock/?id='+id;
+		}
+    }
 });
+
 </script>
 <style> 
 div{  

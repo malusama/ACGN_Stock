@@ -79,7 +79,7 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route('/stock_change', methods=['GET', 'POST'])
+@app.route('/stock_change', methods=['GET'])
 def stock_change():
     stock = handle.get_stock()
     return render_template('stock_change.html',
@@ -87,6 +87,21 @@ def stock_change():
                            username=session['username'],
                            stocks=stock
                            )
+
+
+@app.route('/api/stock_change/', methods=['GET'])
+def get_stock_change():
+    print(request.args.get("limit"))
+    result = handle.test_get_stock(limit=request.args.get('limit'),
+                                   offset=request.args.get('offset'),
+                                   id=request.args.get('id'))
+    res = []
+    for x in result:
+        res.append(x.to_json())
+    return jsonify({
+        "msg": "tset",
+        "stock": res
+    })
 
 
 @app.route('/stock/', methods=['GET', 'POST'])

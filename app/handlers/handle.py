@@ -62,6 +62,19 @@ def get_stock(id=None):
     return stock
 
 
+def test_get_stock(id=None, limit=None, offset=None, order=None):
+    if limit is None:
+        limit = 50
+    if offset is None:
+        offset = 0
+    session = DBSession()
+    query_stock = session.query(Stock)
+    if id:
+        query_stock = query_stock.filter(id=id)
+    return query_stock.offset(offset).limit(limit)
+    pass
+
+
 def buy_stock(stock_id=None, order_number=None,
               order_price=None, user_name=None, order_type=None):
     # order_type 1是购买2是出售
@@ -74,7 +87,7 @@ def buy_stock(stock_id=None, order_number=None,
         if order_type == 1:
             stock_order = session.query(Stock_order).filter(
                 Stock_order.stock_id == stock_id,
-                Stock_order.stock_type == 2
+                Stock_order.order_type == 2
             ).order_by(Stock_order.stock_price).first()
             user = session.query(User).filter(
                 User.nickname == user_name).first()
@@ -125,7 +138,7 @@ def buy_stock(stock_id=None, order_number=None,
                             stock_order = session.query(
                                 Stock_order).filter(
                                 Stock_order.stock_id == stock_id,
-                                Stock_order.stock_type == 2
+                                Stock_order.order_type == 2
                             ).order_by(Stock_order.stock_price).first()
                         elif stock_order and \
                                 stock_order.stock_price <= order_price:
@@ -184,7 +197,7 @@ def buy_stock(stock_id=None, order_number=None,
         elif order_type == 2:
             stock_order = session.query(Stock_order).filter(
                 Stock_order.stock_id == stock_id,
-                Stock_order.stock_type == 1
+                Stock_order.order_type == 1
             ).order_by(-Stock_order.stock_price).first()
             # 买方市场订单
             user = session.query(User).filter(
@@ -240,7 +253,7 @@ def buy_stock(stock_id=None, order_number=None,
                             stock_order = session.query(
                                 Stock_order).filter(
                                 Stock_order.stock_id == stock_id,
-                                Stock_order.stock_type == 1
+                                Stock_order.order_type == 1
                             ).order_by(-Stock_order.stock_price).first()
                         elif stock_order and \
                                 stock_order.stock_price >= order_price:
@@ -334,6 +347,7 @@ def get_user_stock(username=None):
         return None, None
 
 
+@check_args
 def get_stock_order(stock_id=None, user_id=None, order_type=None):
     stock_order = []
 
@@ -344,26 +358,28 @@ def get_stock_order(stock_id=None, user_id=None, order_type=None):
                 Stock_order).filter(
                 Stock_order.stock_id == stock_id,
                 Stock_order.user_id == user_id,
-                Stock_order.stock_type == order_type).all()
-
-            for iter in stock_order_index:
-                temp = {}
-                temp['user_id'] = iter.user_id
-                temp['stock_number'] = iter.stock_number
-                stock_order.append(temp)
-            return stock_order
+                Stock_order.order_type == order_type).all()
+            if stock_order_index:
+                for iter in stock_order_index:
+                    temp = {}
+                    temp['user_id'] = iter.user_id
+                    temp['stock_number'] = iter.stock_number
+                    stock_order.append(temp)
+                return stock_order
         else:
             stock_order_index = session.query(
                 Stock_order).filter(
                 Stock_order.stock_id == stock_id,
                 Stock_order.order_type == order_type).all()
-            for iter in stock_order_index:
-                temp = {}
-                temp['user_id'] = iter.user_id
-                temp['stock_number'] = iter.stock_number
-                temp['stock_price'] = iter.stock_price
-                stock_order.append(temp)
-            return stock_order
+            if stock_order_index:
+                for iter in stock_order_index:
+                    temp = {}
+                    temp['user_id'] = iter.user_id
+                    temp['stock_number'] = iter.stock_number
+                    stock_order.append(temp)
+                return stock_order
+    else:
+        return stock_order
 
 
 def get_stock_cover(stock_id):
@@ -442,7 +458,7 @@ def review_pass(stock_id):
             session.add(sub)
             session.delete(review_stock)
             session.commit()
-
+            # 用户增加股票
             stock = session.query(Stock).filter(name=stock_name).first()
             sub = Bank(user_id=user_id, stock_id=stock.id, stock_number=1000)
             session.add(sub)
