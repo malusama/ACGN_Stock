@@ -81,25 +81,25 @@ def register():
 
 @app.route('/stock_change', methods=['GET'])
 def stock_change():
-    stock = handle.get_stock()
     return render_template('stock_change.html',
                            title='Stock Change',
                            username=session['username'],
-                           stocks=stock
                            )
 
 
 @app.route('/api/stock_change/', methods=['GET'])
 def get_stock_change():
-    print(request.args.get("limit"))
-    result = handle.test_get_stock(limit=request.args.get('limit'),
-                                   offset=request.args.get('offset'),
-                                   id=request.args.get('id'))
+    count, result = handle.get_stock(limit=request.args.get('limit'),
+                                     offset=request.args.get('offset'),
+                                     id=request.args.get('id'))
     res = []
     for x in result:
         res.append(x.to_json())
     return jsonify({
         "msg": "tset",
+        "count": count,
+        "offset": request.args.get('offset'),
+        "limit": request.args.get('limit'),
         "stock": res
     })
 
@@ -108,18 +108,12 @@ def get_stock_change():
 def stock():
     form = Buy_stock()
     id = request.args.get('id')
-    stock_info = handle.get_stock(id)
+    stock = handle.get_stock(id=id)
+    stock_info = []
+    for x in stock:
+        stock_info.append(x.to_json())
+    print(id)
     stock_order_buy = handle.get_stock_order(stock_id=id, order_type=1)
-    if form.validate_on_submit():
-        number = request.form.get('num', None)
-        status = handle.buy_stock(
-            id=id, number=number, user_name=session['username'])
-        stock_info = handle.get_stock(id)
-        if status == 1:
-            flash('buy:{}'.format(number))
-            app.logger.info('buy:{}'.format(request.form.get('num', None)))
-        if status == 2:
-            flash('购买失败，余额不足')
     if id:
         return render_template(
             'stock.html',

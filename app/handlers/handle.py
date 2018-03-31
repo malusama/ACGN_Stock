@@ -40,29 +40,7 @@ def register(user, password, email):
     return True
 
 
-def get_stock(id=None):
-    session = DBSession()
-    stock = []
-    if id:
-        stock_info = session.query(Stock).filter(
-            Stock.id == id).all()
-    else:
-        stock_info = session.query(Stock).all()
-
-    for iter in stock_info:
-        temp = {}
-        temp['id'] = iter.id
-        temp['name'] = iter.name
-        # temp['total'] = iter.total
-        # temp['price'] = iter.price
-        temp['introduction'] = iter.introduction
-        temp['cover'] = '{}'.format(iter.cover)
-        stock.append(temp)
-    session.close()
-    return stock
-
-
-def test_get_stock(id=None, limit=None, offset=None, order=None):
+def get_stock(id=None, limit=None, offset=None, order=None):
     if limit is None:
         limit = 50
     if offset is None:
@@ -70,9 +48,9 @@ def test_get_stock(id=None, limit=None, offset=None, order=None):
     session = DBSession()
     query_stock = session.query(Stock)
     if id:
-        query_stock = query_stock.filter(id=id)
-    return query_stock.offset(offset).limit(limit)
-    pass
+        return query_stock.filter(Stock.id == id)
+    count = query_stock.count()
+    return count, (query_stock.offset(offset).limit(limit))
 
 
 def buy_stock(stock_id=None, order_number=None,
@@ -105,7 +83,7 @@ def buy_stock(stock_id=None, order_number=None,
                     stock_id=stock_id,
                     stock_number=order_number,
                     stock_price=order_price,
-                    stock_type=1)
+                    order_type=1)
                 session.add(sub)
                 session.commit()
                 return "提交订单成功"
@@ -450,8 +428,8 @@ def review_pass(stock_id):
         review_stock = session.query(Stock_apply).filter(
             Stock_apply.id == stock_id).first()
         if review_pass:
-            stock_name = review_pass.stock_name
-            user_id = review_pass.user_id
+            stock_name = review_stock.stock_name
+            user_id = review_stock.user_id
             sub = Stock(name=review_stock.stock_name,
                         cover=review_stock.cover,
                         introduction=review_stock.introduction)

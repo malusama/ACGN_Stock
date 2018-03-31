@@ -3,29 +3,58 @@
 {% block content %}
 
 <div id="stock" >
-	<div v-for="iter in stock_json" style="border-style: solid; display: inline-block;border-width: 1px;width: 200px;" v-on:click="update(iter.id)">
+	<div v-for="iter in stock_json" style="border-style: solid; display: inline-block;border-width: 1px;width: 200px;" v-on:click="sclick(iter.id)">
 		<img :src="iter.cover">
 		<p>[[ iter.name ]]</p>
 	</div>
+  <div v-show="!(limit + offset) < count">
+    <p v-model="offset"> [[ offset ]]</p>
+    <a v-model="offset" v-on:click="stock(Number(offset) + 27, 27)">test</a>
+  </div>
 </div>
 
 <script>  
 var stock = new Vue({
   el: '#stock',
   data: {
-    msg:  '',
-    stock_json:'',
+    msg:'',
+    limit:'',
+    offset:[0],
+    count:'',
+    stock_json:[],
+    stock_temp:[]
   },
     delimiters: ['[[',']]'],
     created: function(){
-         axios.get('/api/stock_change/',{params:{limit:45, offset:0}}).then(function(response) { 
-         	stock.msg = response.data.msg
+         axios.get('/api/stock_change/',{params:{limit:27, offset:0}}).then(function(response) { 
+         	stock.msg = response.data.msg;
+          stock.limit = response.data.limit;
+          stock.offset = response.data.offset;
+          stock.count = response.data.count;
          	stock.stock_json = response.data.stock});
     },
     methods: {
-        update:function sclick(id){  
+        sclick(id){  
     		window.location.href='./stock/?id='+id;
-		}
+		    },
+        stock(offset,limit){
+          var _this = this;
+          axios.get('/api/stock_change/',{params:{limit:limit, offset:offset}}).then(function(response) { 
+            stock.msg = response.data.msg;
+            stock.limit = response.data.limit;
+            stock.offset = response.data.offset;
+            stock.offset = response.data.offset;
+            stock.count = response.data.count;
+            stock.stock_temp = response.data.stock;
+            console.log(stock.offset)
+          }).then(function(){
+            var stock_len = stock.stock_temp.length;
+            for (var i = 0; i < stock_len; i++) {
+                _this.stock_json.push(stock.stock_temp[i])
+            }
+
+          });
+      }
     }
 });
 
