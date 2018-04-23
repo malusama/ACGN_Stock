@@ -1,13 +1,35 @@
 {% extends "base.html" %} {% block content %}
 <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
 <script src="{{ url_for('static', filename='vue.min.js') }}"></script>
+<style type="text/css">
+  .works{
+    height: auto;
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 5px;
+  }
+  .works img{
+    width: 200px;
+    height: 300px;
+    display: inline-block;
 
+  }
+  .works p{
+
+  }
+  #Introduction{
+    position:absolute;    /*绝对定位*/
+    text-indent: 5em;     /*首行缩进 */ 
+    padding-right: 20px;
+    padding-left: 20px;
+    display: inline-block;
+  }
+</style>
 {% for stock in stocks %}
-<div>
-    <p>{{stock.name}}
-        <br>简介: {{stock.introduction}}
-    </p>
+<div class="works">
     <img src={{ image }}  alt={{stock.name}} />
+    <p id="Introduction">简介:</br> {{stock.introduction}}</p>
+    <p>作品名：{{stock.name}}</p>
 </div>
 {% endfor %}
 

@@ -1,15 +1,41 @@
 <script type="text/javascript" src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>  
 {% extends "base.html" %}
 {% block content %}
-
+<style> 
+#works{
+  border-style: solid;
+  display: inline-block;
+  border-width: 1px;
+  width: 200px;
+  border-radius:5px;
+}
+#works img{
+  width: 200px;
+  height: 300px;
+}
+#stock{
+  text-align: center;
+  margin: 10px;
+}
+#stock p{
+  border-style: solid;
+  border-width: 1px;
+  margin-left:auto;
+  margin-right:auto;
+  width:70%;
+  height: 20px;
+  border-radius:5px;
+  -webkit-line-clamp: 6;
+  overflow: hidden;
+}
+</style> 
 <div id="stock" >
-	<div v-for="iter in stock_json" style="border-style: solid; display: inline-block;border-width: 1px;width: 200px;" v-on:click="sclick(iter.id)">
+	<div id ='works' v-for="iter in stock_json"  v-on:click="sclick(iter.id)">
 		<img :src="iter.cover">
 		<p>[[ iter.name ]]</p>
 	</div>
   <div v-show="!(limit + offset) < count">
-    <p v-model="offset"> [[ offset ]]</p>
-    <a v-model="offset" v-on:click="stock(Number(offset) + 27, 27)">test</a>
+    <p v-model="offset" v-on:click="stock(Number(offset) + 27, 27)">下一页</p>
   </div>
 </div>
 
@@ -59,10 +85,6 @@ var stock = new Vue({
 });
 
 </script>
-<style> 
-div{  
-    display: inline-block;  
-}  
-</style> 
+
 {% endblock %}
 
