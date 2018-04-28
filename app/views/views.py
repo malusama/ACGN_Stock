@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*
 from .. import app
 from flask import (
     render_template,
