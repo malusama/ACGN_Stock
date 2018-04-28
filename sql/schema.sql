@@ -21,6 +21,7 @@ CREATE TABLE posts (
     id                SERIAL PRIMARY KEY,
     body              TEXT                          NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL,
+    updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     user_id           VARCHAR(255)                  NOT NULL
 );
 
@@ -35,7 +36,9 @@ CREATE TABLE stock (
     cover             VARCHAR(255)                  DEFAULT NULL,
     image             VARCHAR(255)                  DEFAULT NULL,
     user_id           VARCHAR(255)                  DEFAULT NULL,
+    updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
+
 
 );
 
@@ -48,6 +51,7 @@ CREATE TABLE bank (
     user_id           INTEGER                       NOT NULL,
     stock_id          INTEGER                       NOT NULL,
     stock_number      INTEGER                       NOT NULL,
+    updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
 
@@ -62,6 +66,7 @@ CREATE TABLE stock_order (
     stock_number      INTEGER                       NOT NULL,
     stock_price       INTEGER                       NOT NULL,
     order_type        INTEGER                       NOT NULL,
+    updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
 
@@ -77,5 +82,6 @@ CREATE TABLE stock_apply (
     cover             VARCHAR(255)                  DEFAULT NULL,
     image             VARCHAR(255)                  DEFAULT NULL,
     Introduction      TEXT                          DEFAULT NULL,
+    updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
