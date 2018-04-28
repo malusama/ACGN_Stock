@@ -2,23 +2,31 @@
 {% block content %}
 <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
 <script src="{{ url_for('static', filename='vue.min.js') }}"></script>
+<style type="text/css">
+	#stock_apple div{
+		border-style: solid;
+		width: 350px;
+	}
+	#stock_apply p{
+		display: inline-block;
+	}
+</style>
 <div id='stock_apply'>
-Stock name:<br>
+<p>Stock name:</p>
 <input v-model='stock_name' type="text" name="Stockname">
 <br>
-cover:<br>
+<p>cover:</p>
 <input v-model='stock_cover' type="text" name="cover">
 <br>
-image:<br>
+<p>image:</p>
 <input v-model='stock_image' type="text" name="image">
 <br>
-Introduction:<br>
+<p>Introduction:</p>
 <textarea v-model='stock_introduction' rows="3" cols="20">
 </textarea>
 <br>
 <button v-on:click='submit'>确认</button>
 
-</div>
 
 
 

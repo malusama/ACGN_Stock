@@ -8,3 +8,4 @@ flask-login==0.4.1
 flask-wtf==0.14.2
 psycopg2==2.7.4
 gunicorn==19.7.1
+gevent==1.2.2

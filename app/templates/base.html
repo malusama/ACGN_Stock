@@ -2,7 +2,29 @@
   <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
   <script src="{{ url_for('static', filename='vue.min.js') }}"></script>
   <style type="text/css">
-      body {font-family: sans-serif;}
+      body {
+        font-family: "-apple-system", "BlinkMacSystemFont", 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'Hiragino Sans GB', 'Source Han Sans CN Normal', 'Microsoft YaHei', '微软雅黑', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', "SimHei", 'WenQuanYi Zen Hei Sharp';
+        font: 16px;
+
+      }
+      body a{
+        color: #26A65B;
+        padding-left: 15px;
+        font: 20px;
+        text-decoration: none;
+        font-size: 120%;
+      }
+      .Top-bar{
+        width: 100%; 
+        height: 30px;
+        margin: 0;
+        padding-top: 10px;
+        border-radius: 5px;
+
+      }
+      .Top-bar a{
+
+      }
   </style>
   <head>
     {% if title %}
@@ -12,26 +34,20 @@
     {% endif %}
   </head>
   <body>
-    <div>
+    <div class="Top-bar">
         <a href="{{ url_for('index') }}">Home</a>
         {% if 'username' in session %}
-            <a href="{{ url_for('logout') }}">sign out</a>
-            <a href="{{ url_for('stock_change') }}">stock_change</a>
-            <a href="{{ url_for('stock_apply') }}">stock_apply</a>
+            <a href="{{ url_for('logout') }}">Sign out</a>
+            <a href="{{ url_for('stock_change') }}">Stock Change</a>
+            <a href="{{ url_for('stock_apply') }}">Stock Apply</a>
             {% if user_authority == "1" %}
-                <a href="{{ url_for('apply_review') }}">apply_review</a>
+                <a href="{{ url_for('apply_review') }}">Apply Review</a>
             {% endif %}
-            用户:
             <a href="{{ url_for('user',id=username) }}">{{username}}</a>
-
-            
         {% else %}
-            <a href="{{ url_for('login') }}">sign in</a>
-            <a href="{{ url_for('register') }}">register</a>
+            <a href="{{ url_for('login') }}">Sign in</a>
+            <a href="{{ url_for('register') }}">Register</a>
         {% endif %}
-
-        
-        
     </div>
     <hr>
     {% with messages = get_flashed_messages() %}

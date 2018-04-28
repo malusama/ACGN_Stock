@@ -1,7 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
+  <style type="text/css">
+  body{
+    background: url(http://malu-picture.oss-cn-beijing.aliyuncs.com/18-4-26/46213736.jpg);
+    background-size: cover; 
+  }
+  .Register{
+    float: right;
+    width: 350px;
+    padding-right: 200px;
+    padding-left: 200px;
+    
+  }
+  .Register p{
+    border-radius: 15px;
+  }
+  .Register input{
+    width: 350px;
+    height: 35px;
+    border-radius: 5px;
+  }
+  .Register input:focus{
+    border:1px solid #fffef9;
+    border-radius: 5px;
+  }
+</style>
   <h1>Sign In</h1>
+  <div class="Register">
   <form action="{{ url_for("register") }}" method="post" name="register">
       {{ form.csrf_token }}
       <p>
@@ -19,4 +45,5 @@
       </p>
       <p><input type="submit" value="register"></p>
   </form>
+  <div>
 {% endblock %}

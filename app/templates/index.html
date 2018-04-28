@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
+<style type="text/css">
+	body{
+		background: url(http://malu-picture.oss-cn-beijing.aliyuncs.com/18-4-25/78111317.jpg);
+		background-size: cover; 
+	}
+</style>
 <h1>Hi, {{username}}!</h1>
 {% for post in posts %}
-<div><p>{{post.username}} : <b>{{post.body}}</b></p></div>
+<div class="index">
+	<p>{{post.username}} : <b>{{post.body}}</b>
+	</p>
+</div>
 {% endfor %}
 {% endblock %}

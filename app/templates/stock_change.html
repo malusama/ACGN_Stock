@@ -3,15 +3,22 @@
 {% block content %}
 <style> 
 #works{
-  border-style: solid;
   display: inline-block;
   border-width: 1px;
   width: 200px;
-  border-radius:5px;
+  box-shadow:0px 0px 10px #26A65B;
+  transition: all 0.2s;/*图片放大过程的时间*/
+  background-color: #f05b72;
+  margin: 10px;
+  border-radius: 5px;
+}
+#works:hover{
+  transform: scale(1.1);/*鼠标经过图片放大的倍数*/
 }
 #works img{
   width: 200px;
   height: 300px;
+  border-radius: 5px;
 }
 #stock{
   text-align: center;
@@ -27,6 +34,7 @@
   border-radius:5px;
   -webkit-line-clamp: 6;
   overflow: hidden;
+  background-color: #fffef9;
 }
 </style> 
 <div id="stock" >
@@ -35,7 +43,7 @@
 		<p>[[ iter.name ]]</p>
 	</div>
   <div v-show="!(limit + offset) < count">
-    <p v-model="offset" v-on:click="stock(Number(offset) + 27, 27)">下一页</p>
+    <p v-model="offset" v-on:click="stock(Number(offset) + 24, 24)">下一页</p>
   </div>
 </div>
 

@@ -67,6 +67,7 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = Register()
+    # print(form.validate_on_submit())
     if form.validate_on_submit():
         user_name = request.form.get('username', None)
         password = request.form.get('password', None)
@@ -112,7 +113,7 @@ def stock():
     stock_info = []
     for x in stock:
         stock_info.append(x.to_json())
-    print(id)
+    # print(id)
     stock_order_buy = handle.get_stock_order(stock_id=id, order_type=1)
     if id:
         return render_template(
@@ -132,7 +133,7 @@ def stock():
 def get_stock_order():
     stock_id = request.args.get('id')
     order_type = request.args.get('type')
-    app.logger.info('id:,type:'.format(stock_id, order_type))
+    # app.logger.info('id:,type:'.format(stock_id, order_type))
     return jsonify({
         "msg": "tset",
         "body": handle.get_stock_order(
@@ -187,7 +188,7 @@ def stock_apply():
 
 @app.route('/api/stock_apply/', methods=['POST'])
 def stock_apply_submit():
-    print(request.get_json())
+    # print(request.get_json())
     try:
         msg = handle.stock_apply(user_id=request.get_json().get('user_id'),
                                  stock_name=request.get_json().get('stock_name'),
