@@ -11,6 +11,12 @@ from app.models import (
 from .base import (
     check_args
 )
+from app.config import (
+    redis_client,
+    REQUEST_CACHE_TIMEOUT
+)
+import json
+
 
 Tax = 1.1
 
@@ -21,7 +27,9 @@ def authorization(user, password):
         User.nickname == user).first()
     if dbuser is not None:
         if dbuser.password == password:
+            session.close()
             return True
+    session.close()
     return False
 
 
@@ -38,20 +46,34 @@ def register(user, password, email):
                     email=email)
     session.add(userinfo)
     session.commit()
+    session.close()
     return True
 
 
-def get_stock(id=None, limit=None, offset=None, order=None):
+def get_stock(user_id=None, limit=None, offset=None, order=None):
     if limit is None:
         limit = 50
     if offset is None:
         offset = 0
+    content = redis_client.get(
+        "id{}limit{}offset{}order{}".format(
+            user_id, limit, offset, order))
+    if content:
+        return [json.loads(content)[0], json.loads(content)[1]]
     session = DBSession()
     query_stock = session.query(Stock)
-    if id:
-        return query_stock.filter(Stock.id == id)
+    if user_id:
+        return query_stock.filter(Stock.id == user_id)
     count = query_stock.count()
-    return count, (query_stock.offset(offset).limit(limit))
+    res = []
+    stock = query_stock.offset(offset).limit(limit)
+    for x in stock:
+        res.append(x.to_json())
+    redis_client.setex("id{}limit{}offset{}order{}".format(
+        id, limit, offset, order),
+        json.dumps([count, res]),
+        REQUEST_CACHE_TIMEOUT)
+    return [count, res]
 
 
 def buy_stock(stock_id=None, order_number=None,
@@ -286,9 +308,12 @@ def buy_stock(stock_id=None, order_number=None,
 
 
 def get_post():
+    content = redis_client.get('post')
+    if content:
+        return json.loads(content)
     session = DBSession()
     posts = session.query(Post).all()
-    post = []
+    content = []
     for iter in posts:
         temp = {}
         temp['body'] = iter.body
@@ -299,8 +324,9 @@ def get_post():
             temp['username'] = user.nickname
         else:
             temp['username'] = 'None'
-        post.append(temp)
-    return post
+        content.append(temp)
+    redis_client.setex('post', json.dumps(content), REQUEST_CACHE_TIMEOUT)
+    return content
 
 
 def get_user_stock(username=None):

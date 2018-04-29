@@ -83,6 +83,8 @@ def register():
 
 @app.route('/stock_change', methods=['GET'])
 def stock_change():
+    if 'username' not in session:
+        return redirect(url_for('index'))
     return render_template('stock_change.html',
                            title='Stock Change',
                            username=session['username'],
@@ -91,18 +93,15 @@ def stock_change():
 
 @app.route('/api/stock_change/', methods=['GET'])
 def get_stock_change():
-    count, result = handle.get_stock(limit=request.args.get('limit'),
-                                     offset=request.args.get('offset'),
-                                     id=request.args.get('id'))
-    res = []
-    for x in result:
-        res.append(x.to_json())
+    result = handle.get_stock(limit=request.args.get('limit'),
+                              offset=request.args.get('offset'),
+                              user_id=request.args.get('id'))
     return jsonify({
         "msg": "tset",
-        "count": count,
+        "count": result[0],
         "offset": request.args.get('offset'),
         "limit": request.args.get('limit'),
-        "stock": res
+        "stock": result[1]
     })
 
 
@@ -111,15 +110,11 @@ def stock():
     form = Buy_stock()
     id = request.args.get('id')
     stock = handle.get_stock(id=id)
-    stock_info = []
-    for x in stock:
-        stock_info.append(x.to_json())
-    # print(id)
     stock_order_buy = handle.get_stock_order(stock_id=id, order_type=1)
     if id:
         return render_template(
             'stock.html',
-            stocks=stock_info,
+            stocks=stock,
             form=form,
             image="{}{}".format(
                 "", handle.get_stock_cover(request.args.get('id'))),

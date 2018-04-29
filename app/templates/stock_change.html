@@ -6,7 +6,7 @@
   display: inline-block;
   border-width: 1px;
   width: 200px;
-  box-shadow:0px 0px 10px #26A65B;
+  
   transition: all 0.2s;/*图片放大过程的时间*/
   background-color: #f05b72;
   margin: 10px;
@@ -14,6 +14,7 @@
 }
 #works:hover{
   transform: scale(1.1);/*鼠标经过图片放大的倍数*/
+  box-shadow:0px 0px 15px #26A65B;
 }
 #works img{
   width: 200px;
@@ -60,7 +61,7 @@ var stock = new Vue({
   },
     delimiters: ['[[',']]'],
     created: function(){
-         axios.get('/api/stock_change/',{params:{limit:27, offset:0}}).then(function(response) { 
+         axios.get('/api/stock_change/',{params:{limit:24, offset:0}}).then(function(response) { 
          	stock.msg = response.data.msg;
           stock.limit = response.data.limit;
           stock.offset = response.data.offset;

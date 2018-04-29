@@ -91,7 +91,7 @@ class Stock_apply(Base):
     introduction = Column(Text, default='')
 
 
-engine = create_engine(
-    'postgresql://stock:chensicheng@localhost:5432/dev_stock')
+scheme = 'postgresql://stock:chensicheng@localhost:5432/dev_stock'
+engine = create_engine(scheme, pool_size=100, pool_recycle=1200)
 # 创建DBSession类型:
 DBSession = sessionmaker(bind=engine)
