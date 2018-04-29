@@ -109,7 +109,7 @@ def get_stock_change():
 def stock():
     form = Buy_stock()
     id = request.args.get('id')
-    stock = handle.get_stock(id=id)
+    stock = handle.get_stock(user_id=id)
     stock_order_buy = handle.get_stock_order(stock_id=id, order_type=1)
     if id:
         return render_template(
