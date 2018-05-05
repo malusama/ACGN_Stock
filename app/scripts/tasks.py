@@ -7,12 +7,10 @@ import redis
 from celery import Celery
 
 import sys
-
 sys.path.append('../')
 from models import (
     models
 )
-
 app = Celery('tasks', broker='redis://localhost:6379/3')
 redis_client = redis.Redis(host='localhost', port=6379,
                            db=1, decode_responses=True)
@@ -24,6 +22,7 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) ' \
 
 REQUEST_CACHE_TIMEOUT = 30 * 60 * 60 * 24  # 30 days
 proxies = { "http": "socks5://127.0.0.1:10010"}
+
 
 def pq(content):
     if content:
@@ -42,9 +41,9 @@ def retry(times=3):
                     gevent.sleep(3)
                 else:
                     break
-        
+
         return wrapper
-    
+
     return deco
 
 
@@ -68,21 +67,23 @@ def get_web_page(url, timeout=15):
         logger.warning('Get web page {} error'.format(url))
 
 
-
+@app.task
 def worker(url):
     print(url)
+    # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
     html = pq(get_web_page(url))
-    # print(html)
     works_name = html(".hreview h1").text()
     release_time = html(".mg-b20 tr").eq(2)("td").eq(1).text()
     length_time = html(".mg-b20 tr").eq(3)("td").eq(1).text()
     works_series = html(".mg-b20 tr").eq(4)("td").eq(1).text()
     company = html(".mg-b20 tr").eq(5)("td").eq(1).text()
     factory = html(".mg-b20 tr").eq(6)("td").eq(1).text()
-    category = html(".mg-b20 tr").eq(7)("td").eq(1).text().split()
-    cover = "https://{}".format(html("#sample-video a").attr("href").split('://')[1])
+    category = html(".mg-b20 tr").eq(7)("td").eq(1).text().split()[1:-1]
+    cover = "https://{}".format(
+        html("#sample-video a").attr("href").split('://')[1])
     Introduction = html(".lh4").text()
-    Screenshots = ["https://{}".format(i.attr("src").split("://")[1]) for i in html("#sample-image-block img").items()]
+    Screenshots = ["https://{}".format(i.attr("src").split("://")[1])
+                   for i in html("#sample-image-block img").items()]
     print("作品名：{},\n发布时间:{}，\n影片时长:{}，\n影片系列：{}，\n公司：{}，\n厂商：{}，\n类别：{}, \ncover:{}, \n简介:{}, \n截图:{}".format(
         works_name,
         release_time,
@@ -93,9 +94,10 @@ def worker(url):
         category,
         cover,
         Introduction,
-        ",".join(i for i in Screenshots)
+        Screenshots
     ))
     session = models.DBSession()
+
     if session.query(models.Stock).filter(models.Stock.name == works_name).first():
         print("已经存在")
     else:
@@ -106,6 +108,10 @@ def worker(url):
                 session.add(sub)
                 session.commit()
             tag.append(session.query(models.Stock_Tag).filter(models.Stock_Tag.tag == i).first().id)
+    
+    if session.query(models.Stock).filter(models.Stock.name == works_name).first():
+        print("已经存在")
+    else:
         sub = models.Stock(name=works_name,
                            introduction=Introduction,
                            cover=cover,
@@ -119,10 +125,4 @@ def worker(url):
                            )
         session.add(sub)
         session.commit()
-        session.close()
-    print("插入成功")
-
-
-if __name__ == '__main__':
-    # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
-    worker('http://www.dmm.co.jp/digital/anime/-/detail/=/cid=62gbr00013/?dmmref=recommend13&i3_ref=recommend&i3_ord=2')
+        print("插入成功")

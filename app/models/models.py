@@ -22,6 +22,10 @@ class User(Base):
                         default=datetime.datetime.now)
     posts = relationship('Post', backref='author', lazy='dynamic')
     stocks = relationship('Bank', backref='user_name', lazy='dynamic')
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
 
     def __repr__(self):
         return '<User %r>' % (self.nickname)
@@ -35,6 +39,10 @@ class Post(Base):
     created_at = Column(DateTime, nullable=False,
                         default=datetime.datetime.now)
     user_id = Column(Integer, ForeignKey('users.id'))
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
 
     def __repr__(self):
         return '<Post %r>' % (self.body)
@@ -46,8 +54,22 @@ class Stock(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text, unique=True, nullable=False)
     introduction = Column(Text, default='')
-    cover = Column(String(255), default=None)
+    cover = Column(Text, default=None)
+
+    user_id = Column(String(255), default=None)
+    works_series = Column(Text, default='')
+    release_time = Column(String(255), default=None)
+    length_time = Column(String(255), default=None)
+    company = Column(String(255), default=None)
+    factory = Column(String(255), default=None)
+    category = Column(String(255), default=None)
+    screenshots = Column(Text, default='')
+
     banks = relationship('Bank', backref='stock', lazy='dynamic')
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
 
     def to_json(self):
         return {
@@ -55,7 +77,13 @@ class Stock(Base):
             'name': self.name,
             'introduction': self.introduction,
             'cover': self.cover,
-            'cover': self.cover,
+            'works_series': self.works_series,
+            'release_time': self.release_time,
+            'length_time': self.length_time,
+            'company': self.company,
+            'factory': self.factory,
+            'category': self.category,
+            'screenshots': self.screenshots
         }
 
 
@@ -66,6 +94,10 @@ class Bank(Base):
     user_id = Column(Integer, ForeignKey('users.id'))
     stock_id = Column(Integer, ForeignKey('stock.id'))
     stock_number = Column(String(255), default=None)
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
 
 
 class Stock_order(Base):
@@ -77,6 +109,10 @@ class Stock_order(Base):
     stock_number = Column(String(255), default=None)
     order_type = Column(Integer, nullable=False)
     stock_price = Column(Integer, nullable=False)
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
 
 
 class Stock_apply(Base):
@@ -89,6 +125,44 @@ class Stock_apply(Base):
     cover = Column(String(255), default=None)
     image = Column(String(255), default=None)
     introduction = Column(Text, default='')
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
+
+
+class Stock_Magnet(Base):
+    __tablename__ = 'stock_magnet'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    stock_id = Column(Integer, ForeignKey('stock.id'))
+    magnet = Column(Text, nullable=False)
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'Magnet': self.magnet,
+        }
+
+
+class Stock_Tag(Base):
+    __tablename__ = 'stock_tag'
+    id = Column(Integer, primary_key=True)
+    tag = Column(String(255), unique=True)
+    created_at = Column(DateTime, nullable=False,
+                        default=datetime.datetime.now)
+    updated_at = Column(DateTime, default=datetime.datetime.now,
+                        onupdate=datetime.datetime.now)
+
+    def to_json(self):
+        return {
+            "id": self.id,
+            "tag": self.tag,
+        }
 
 
 scheme = 'postgresql://stock:chensicheng@localhost:5432/dev_stock'

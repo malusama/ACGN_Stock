@@ -6,7 +6,8 @@ from app.models import (
     Bank,
     Stock_order,
     Post,
-    Stock_apply
+    Stock_apply,
+    Stock_Magnet
 )
 from .base import (
     check_args
@@ -55,11 +56,11 @@ def get_stock(user_id=None, limit=None, offset=None, order=None):
         limit = 50
     if offset is None:
         offset = 0
-    content = redis_client.get(
-        "id{}limit{}offset{}order{}".format(
-            user_id, limit, offset, order))
-    if content:
-        return [json.loads(content)[0], json.loads(content)[1]]
+    # content = redis_client.get(
+    #     "id{}limit{}offset{}order{}".format(
+    #         user_id, limit, offset, order))
+    # if content:
+    #     return [json.loads(content)[0], json.loads(content)[1]]
     session = DBSession()
     query_stock = session.query(Stock)
     if user_id:
@@ -69,10 +70,10 @@ def get_stock(user_id=None, limit=None, offset=None, order=None):
     stock = query_stock.offset(offset).limit(limit)
     for x in stock:
         res.append(x.to_json())
-    redis_client.setex("id{}limit{}offset{}order{}".format(
-        id, limit, offset, order),
-        json.dumps([count, res]),
-        REQUEST_CACHE_TIMEOUT)
+    # redis_client.setex("id{}limit{}offset{}order{}".format(
+    #     id, limit, offset, order),
+    #     json.dumps([count, res]),
+    #     REQUEST_CACHE_TIMEOUT)
     return [count, res]
 
 
@@ -308,9 +309,9 @@ def buy_stock(stock_id=None, order_number=None,
 
 
 def get_post():
-    content = redis_client.get('post')
-    if content:
-        return json.loads(content)
+    # content = redis_client.get('post')
+    # if content:
+    #     return json.loads(content)
     session = DBSession()
     posts = session.query(Post).all()
     content = []
@@ -325,7 +326,7 @@ def get_post():
         else:
             temp['username'] = 'None'
         content.append(temp)
-    redis_client.setex('post', json.dumps(content), REQUEST_CACHE_TIMEOUT)
+    # redis_client.setex('post', json.dumps(content), REQUEST_CACHE_TIMEOUT)
     return content
 
 
@@ -464,7 +465,8 @@ def review_pass(stock_id):
             session.delete(review_stock)
             session.commit()
             # 用户增加股票
-            stock = session.query(Stock).filter(name=stock_name).first()
+            stock = session.query(Stock).filter(
+                Stock.name == stock_name).first()
             sub = Bank(user_id=user_id, stock_id=stock.id, stock_number=1000)
             session.add(sub)
             session.commit()
@@ -473,3 +475,36 @@ def review_pass(stock_id):
             raise ValueError
     else:
         raise ValueError
+
+
+def getMagenet(stock_id):
+    if stock_id:
+        session = DBSession()
+        Magnet = session.query(
+            Stock_Magnet).filter(Stock_Magnet.stock_id == stock_id).all()
+        res = []
+        for i in Magnet:
+            # print(i)
+            res.append(i.to_json())
+        session.close()
+        return res
+    pass
+
+
+@check_args
+def addMagnet(stock_id, Magnet, user_id):
+    session = DBSession()
+    sub = Stock_Magnet(stock_id=stock_id, magnet=Magnet, user_id=user_id)
+    session.add(sub)
+    session.commit()
+    session.close()
+    return "成功"
+    pass
+
+
+@check_args
+def get_stock_info(stock_id):
+    session = DBSession()
+    stock = session.query(Stock).filter(Stock.id == stock_id).first()
+    session.close()
+    return stock.to_json()

@@ -36,6 +36,13 @@ CREATE TABLE stock (
     cover             VARCHAR(255)                  DEFAULT NULL,
     image             VARCHAR(255)                  DEFAULT NULL,
     user_id           VARCHAR(255)                  DEFAULT NULL,
+    works_series      TEXT                          DEFAULT NULL,
+    release_time      VARCHAR(255)                  DEFAULT NULL,
+    length_time       VARCHAR(255)                  DEFAULT NULL,
+    company           VARCHAR(255)                  DEFAULT NULL,
+    factory           VARCHAR(255)                  DEFAULT NULL,
+    category          VARCHAR(255)                  DEFAULT NULL,
+    Screenshots       TEXT                          DEFAULT NULL,
     updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 
@@ -85,3 +92,17 @@ CREATE TABLE stock_apply (
     updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
     created_at        TIMESTAMP                     DEFAULT now() NOT NULL
 );
+
+
+--
+-- TABLE: stock_magnet
+--
+CREATE TABLE stock_magnet (
+    id                SERIAL PRIMARY KEY,
+    user_id           INTEGER                       NOT NULL,
+    stock_id          INTEGER                       NOT NULL,
+    Magnet            TEXT                          NOT NULL,
+    updated_at        TIMESTAMP                     DEFAULT now() NOT NULL,
+    created_at        TIMESTAMP                     DEFAULT now() NOT NULL
+);
+

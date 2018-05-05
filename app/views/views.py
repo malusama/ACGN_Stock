@@ -115,6 +115,7 @@ def stock():
         return render_template(
             'stock.html',
             stocks=stock,
+            title="Stock",
             form=form,
             image="{}{}".format(
                 "", handle.get_stock_cover(request.args.get('id'))),
@@ -278,3 +279,37 @@ def apple_pass():
         return jsonify({
             "msg": "用户不存在"
         })
+
+
+@app.route('/api/Magnet/', methods=['POST'])
+def add_Magnet():
+    if 'username' in session:
+        msg = handle.addMagnet(
+            stock_id=request.get_json().get('stock_id'),
+            Magnet=request.get_json().get('Magnet'),
+            user_id=handle.get_userid(session['username']))
+        return jsonify({
+            "msg": msg
+        })
+    pass
+
+
+@app.route('/api/Magnet/', methods=['GET'])
+def get_Magnet():
+    print(request.args.get('stock_id'))
+    magnet = handle.getMagenet(stock_id=request.args.get('stock_id'))
+    return jsonify({
+        "msg": 'ok',
+        "Magnet": magnet
+    })
+    pass
+
+
+@app.route('/api/stockinfo/', methods=['GET'])
+def get_Stock_info():
+    json = handle.get_stock_info(stock_id=request.args.get('stock_id'))
+    return jsonify({
+        "msg": "ok",
+        "json": json
+    })
+    pass

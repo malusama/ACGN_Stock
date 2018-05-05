@@ -1,38 +1,76 @@
 {% extends "base.html" %} {% block content %}
-<script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
+<script src="{{ url_for('static', filename='axios.min.js') }}"></script>
 <script src="{{ url_for('static', filename='vue.min.js') }}"></script>
 <style type="text/css">
   .works{
-    height: auto;
     border-style: solid;
     border-width: 2px;
     border-radius: 5px;
   }
   .works img{
-    width: 200px;
-    height: 300px;
+    width: 30%;
+    height: 400px;
     display: inline-block;
 
   }
-  .works p{
+  .tag{
+    position:absolute;
+    display: inline-block;
+    width: 69%;
+    right: 0px;
+    height: 400px;
 
   }
-  #Introduction{
-    position:absolute;    /*绝对定位*/
-    text-indent: 5em;     /*首行缩进 */ 
-    padding-right: 20px;
+  .tag p{
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  .screenshots img{
+    width: 250px;
+    height: 150px;
+    padding-left: 5px;
+  }
+  #addMagnet{
+    border-width: 2px;
     padding-left: 20px;
-    display: inline-block;
+  }
+  #Magnet p{
+    border-width: 1px;
+    border-radius: 5px;
+    height: 30px;
+    font-size: 20px;
+    color: #2a5caa;
   }
 </style>
-{% for stock in stocks %}
-<div class="works">
-    <img src={{ image }}  alt={{stock.name}} />
-    <p id="Introduction">简介:</br> {{stock.introduction}}</p>
-    <p>作品名：{{stock.name}}</p>
-</div>
-{% endfor %}
 
+<div class="works">
+    <img :src="cover">
+    <div class="tag">
+      <p>作品名：[[ name ]]</p>
+      <p>发布时间：[[ release_time ]]</p>
+      <p>时长：[[ length_time ]]</p>
+      <p>公司：[[ company ]]</p>
+      <p>制作社：[[ factory ]]</p>
+      <p>类型：[[ category ]]</p>
+      <p>简介: [[ introduction ]]</p>
+    </div>
+    <p>截图</p>
+    <div class="screenshots">
+      <img v-for="iter in screenshots" :src="iter">
+    </div>
+</div>
+
+
+<div id="addMagnet"> 
+  <p v-on:click="show = !show">添加磁力链接</p>
+  <input type="Magnet" name="addMagenet" v-model='Magnet' v-if="show">
+  <button v-on:click="submit" v-if="show">添加</button>
+</div>
+<div id="Magnet">
+  <p v-for="iter in Magnet" v-model='Magnet' class="Magnet">
+      [[ iter.Magnet ]]
+  </p>
+</div>
 
 <div id="order_Selling">
 <p>卖单：</p>
@@ -65,6 +103,108 @@
 
 </div>
 <script>
+var info = new Vue({
+  el: '.works',
+  data: {
+    msg: '',
+    name: '',
+    introduction: '',
+    cover: '',
+    works_series: '',
+    release_time: '',
+    length_time: '',
+    company: '',
+    factory: '',
+    category: '',
+    screenshots: ''
+  },
+    delimiters: ['[[',']]'],
+    created: function(){
+         axios.get('/api/stockinfo/',{params:{
+          stock_id:getQueryString("id")}}).then(function(response) {
+           info.msg = response.data.msg,
+           info.name = response.data.json.name,
+           info.introduction = response.data.json.introduction,
+           info.cover = response.data.json.cover,
+           info.works_series = response.data.json.works_series,
+           info.release_time = response.data.json.release_time,
+           info.length_time = response.data.json.length_time,
+           info.company = response.data.json.company,
+           info.factory = response.data.json.factory,
+           info.category = response.data.json.category,
+           info.screenshots = response.data.json.screenshots.split(','),
+           console.log(info.screenshots)
+            });
+    },
+    methods: {
+        update:function(){
+         axios.get('/api/stockinfo/',{params:{
+          stock_id:getQueryString("id")}}).then(function(response) { 
+           info.msg = response.data.msg,
+           info.name = response.data.json.name,
+           info.introduction = response.data.json.introduction,
+           info.cover = response.data.json.cover,
+           info.works_series = response.data.json.works_series,
+           info.release_time = response.data.json.release_time,
+           info.length_time = response.data.json.name,
+           info.company = response.data.json.company,
+           info.factory = response.data.json.factory,
+           info.category = response.data.json.category,
+           info.screenshots = response.data.json.screenshots
+            });
+        }
+    }
+})
+
+
+var addMagnet = new Vue({
+  el: '#addMagnet',
+  data:{
+    msg: '',
+    Magnet: '',
+    show: false
+  },
+    delimiters: ['[[',']]'],
+    methods:{
+        submit: function () {
+            axios.post('/api/Magnet/',{
+                stock_id:getQueryString("id"),
+                Magnet:addMagnet.Magnet,
+            }).then(function(response){
+                // console.log(response.data),
+                addMagnet.msg = response.data.msg,
+                Magnet.update()
+            })
+        }
+    }
+})
+var Magnet = new Vue({
+  el: '#Magnet',
+  data: {
+    msg: '',
+    Magnet: ''
+  },
+    delimiters: ['[[',']]'],
+    created: function(){
+         axios.get('/api/Magnet/',{params:{
+          stock_id:getQueryString("id")}}).then(function(response) { 
+           Magnet.msg = response.data.msg,
+           Magnet.Magnet = response.data.Magnet,
+           console.log(Magnet.Magnet)
+            });
+    },
+    methods: {
+        update:function(){
+         axios.get('/api/Magnet/',{params:{
+          stock_id:getQueryString("id")}}).then(function(response) { 
+           Magnet.msg = response.data.msg,
+           Magnet.Magnet = response.data.Magnet,
+           console.log(Magnet.Magnet)
+            });
+        }
+    }
+})
+
 
 var order_Buying = new Vue({
   el: '#order_Buying',
@@ -76,11 +216,23 @@ var order_Buying = new Vue({
   },
     delimiters: ['[[',']]'],
     created: function(){
-         axios.get('/api/stock/',{params:{id:getQueryString("id"),type:1}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Buying.msg = response.data.body });
+         axios.get('/api/stock/',{params:{id:getQueryString("id"),type:1}}).then(function(response) { 
+              // console.log(response.data); 
+              // console.log(response.status); 
+              // console.log(response.statusText); 
+              // console.log(response.headers); 
+              // console.log(response.config); 
+              order_Buying.msg = response.data.body });
     },
     methods: {
         update:function(){
-            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:1}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Buying.msg = response.data.body });
+            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:1}}).then(function(response) { 
+              // console.log(response.data); 
+              // console.log(response.status); 
+              // console.log(response.statusText); 
+              // console.log(response.headers); 
+              // console.log(response.config); 
+              order_Buying.msg = response.data.body });
 
         }
     }
@@ -99,17 +251,23 @@ var order_Selling = new Vue({
             params:{
                 id:getQueryString("id"),
                 type:2}}).then(function(response) {
-                 console.log(response.data);
-                 console.log(response.status);
-                 console.log(response.statusText);
-                 console.log(response.headers);
-                 console.log(response.config);
+                 // console.log(response.data);
+                 // console.log(response.status);
+                 // console.log(response.statusText);
+                 // console.log(response.headers);
+                 // console.log(response.config);
                  order_Selling.msg = response.data.body 
                   });
     },
     methods: {
         update:function(){
-            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:2}}).then(function(response) { console.log(response.data); console.log(response.status); console.log(response.statusText); console.log(response.headers); console.log(response.config); order_Selling.msg = response.data.body });
+            axios.get('/api/stock/',{params:{id:getQueryString("id"),type:2}}).then(function(response) { 
+              // console.log(response.data); 
+              // console.log(response.status); 
+              // console.log(response.statusText); 
+              // console.log(response.headers); 
+              // console.log(response.config); 
+              order_Selling.msg = response.data.body });
 
         }
     }
@@ -131,7 +289,7 @@ var order_submit = new Vue({
                 order_price:order_submit.stock_price,
                 order_type:order_submit.order_type
             }).then(function(response){
-                console.log(response.data),
+                // console.log(response.data),
                 order_submit.message = response.data.msg,
                 order_Selling.update(),
                 order_Buying.update()
