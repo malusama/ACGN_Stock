@@ -61,7 +61,11 @@ var stock = new Vue({
   },
     delimiters: ['[[',']]'],
     created: function(){
-         axios.get('/api/stock_change/',{params:{limit:24, offset:0}}).then(function(response) { 
+         axios.get('/api/stock_change/',{params:{limit:24, offset:0,
+          factory:getQueryVariable("factory"),
+          company:getQueryVariable("company"),
+          category:getQueryVariable("category")
+        }}).then(function(response) { 
          	stock.msg = response.data.msg;
           stock.limit = response.data.limit;
           stock.offset = response.data.offset;
@@ -70,11 +74,15 @@ var stock = new Vue({
     },
     methods: {
         sclick(id){  
-    		window.location.href='./stock/?id='+id;
+    		window.location.href='/stock/?id='+id;
 		    },
         stock(offset,limit){
           var _this = this;
-          axios.get('/api/stock_change/',{params:{limit:limit, offset:offset}}).then(function(response) { 
+          axios.get('/api/stock_change/',{params:{limit:limit, offset:offset,
+          factory:getQueryVariable("factory"),
+          company:getQueryVariable("company"),
+          category:getQueryVariable("category")
+          }}).then(function(response) { 
             stock.msg = response.data.msg;
             stock.limit = response.data.limit;
             stock.offset = response.data.offset;
@@ -92,7 +100,30 @@ var stock = new Vue({
       }
     }
 });
-
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+    }
+function getQueryVariable(variable)
+{
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return decodeURIComponent(pair[1]);}
+       }
+       return(null);
+}
+function getUrlVars() {
+  var vars = {};
+  var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&#]*)/gi,
+    function(m,key,value) {
+      vars[key] = value;
+    }
+  );
+  return decodeURIComponent(vars);
+}
 </script>
 
 {% endblock %}

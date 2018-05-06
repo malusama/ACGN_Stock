@@ -38,7 +38,6 @@
         <a href="{{ url_for('index') }}">Home</a>
         {% if 'username' in session %}
             <a href="{{ url_for('logout') }}">Sign out</a>
-            <a href="{{ url_for('stock_change') }}">Stock Change</a>
             <a href="{{ url_for('stock_apply') }}">Stock Apply</a>
             {% if user_authority == "1" %}
                 <a href="{{ url_for('apply_review') }}">Apply Review</a>

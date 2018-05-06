@@ -25,6 +25,10 @@
     padding-left: 15px;
     padding-right: 15px;
   }
+  .tag a{
+    font-family: '微软雅黑';
+    font-size: 16px;
+  }
   .screenshots img{
     width: 250px;
     height: 150px;
@@ -49,9 +53,9 @@
       <p>作品名：[[ name ]]</p>
       <p>发布时间：[[ release_time ]]</p>
       <p>时长：[[ length_time ]]</p>
-      <p>公司：[[ company ]]</p>
-      <p>制作社：[[ factory ]]</p>
-      <p>类型：[[ category ]]</p>
+      <p>公司：<a :href="'/stock_change/?company=' + company">[[ company ]]</a></p>
+      <p>制作社：<a :href="'/stock_change/?factory=' + factory">[[ factory ]]</a></p>
+      <p>类型：<a v-for=" (iter, index) in category_name" :href="'/stock_change/?category=' + category[index]">[[ iter ]]</a></p>
       <p>简介: [[ introduction ]]</p>
     </div>
     <p>截图</p>
@@ -65,6 +69,7 @@
   <p v-on:click="show = !show">添加磁力链接</p>
   <input type="Magnet" name="addMagenet" v-model='Magnet' v-if="show">
   <button v-on:click="submit" v-if="show">添加</button>
+  <p>[[ msg ]]</p>
 </div>
 <div id="Magnet">
   <p v-for="iter in Magnet" v-model='Magnet' class="Magnet">
@@ -116,6 +121,7 @@ var info = new Vue({
     company: '',
     factory: '',
     category: '',
+    category_name: '',
     screenshots: ''
   },
     delimiters: ['[[',']]'],
@@ -131,9 +137,11 @@ var info = new Vue({
            info.length_time = response.data.json.length_time,
            info.company = response.data.json.company,
            info.factory = response.data.json.factory,
-           info.category = response.data.json.category,
-           info.screenshots = response.data.json.screenshots.split(','),
-           console.log(info.screenshots)
+           info.category = response.data.json.category.split(','),
+           console.log(info.category)
+           info.category_name = response.data.json.category_name.split(','),
+           info.screenshots = response.data.json.screenshots.split(',')
+           // console.log(info.screenshots)
             });
     },
     methods: {
@@ -149,8 +157,9 @@ var info = new Vue({
            info.length_time = response.data.json.name,
            info.company = response.data.json.company,
            info.factory = response.data.json.factory,
-           info.category = response.data.json.category,
-           info.screenshots = response.data.json.screenshots
+           info.category = response.data.json.category,split(','),
+           info.category_name = response.data.json.category_name.split(','),
+           info.screenshots = response.data.json.screenshots.split(',')
             });
         }
     }

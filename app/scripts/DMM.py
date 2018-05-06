@@ -16,7 +16,7 @@ USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) ' \
     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
 
 REQUEST_CACHE_TIMEOUT = 30 * 60 * 60 * 24  # 30 days
-proxies = { "http": "socks5://127.0.0.1:10010"}
+proxies = {"http": "socks5://127.0.0.1:10010"}
 
 
 def pq(content):
@@ -63,7 +63,7 @@ def get_web_page(url, timeout=15):
 def get_anime_link():
     anime_link = []
     # session = models.DBSession()
-    for i in range(1,2):
+    for i in range(1, 18):
         html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
         for i in html("#list li .tmb a").items():
             # print(i.attr("href").split()[0])

@@ -22,17 +22,16 @@ from app.handlers import (
 @app.route('/')
 @app.route('/index')
 def index():
-    if 'username' in session:
+    if 'username' not in session:
+        username = None
+        user_authority = '0'
+    else:
         username = session['username']
         user_authority = handle.get_user_authority(username)
-    else:
-        username = 'None'
-        user_authority = 0
-    return render_template('index.html',
-                           title='ACGN Stock Change',
-                           username=username,
-                           user_authority=user_authority,
-                           posts=handle.get_post())
+    return render_template('stock_change.html',
+                           title='ACGN 交易所',
+                           user_authority=user_authority
+                           )
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -81,13 +80,17 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route('/stock_change', methods=['GET'])
+@app.route('/stock_change/', methods=['GET'])
 def stock_change():
     if 'username' not in session:
-        return redirect(url_for('index'))
+        username = None
+        user_authority = '0'
+    else:
+        username = session['username']
+        user_authority = handle.get_user_authority(username)
     return render_template('stock_change.html',
                            title='Stock Change',
-                           username=session['username'],
+                           user_authority=user_authority
                            )
 
 
@@ -95,18 +98,33 @@ def stock_change():
 def get_stock_change():
     result = handle.get_stock(limit=request.args.get('limit'),
                               offset=request.args.get('offset'),
-                              user_id=request.args.get('id'))
+                              user_id=request.args.get('id'),
+                              name=request.args.get('name'),
+                              company=request.args.get('company'),
+                              factory=request.args.get('factory'),
+                              category=request.args.get('category')
+                              )
     return jsonify({
         "msg": "tset",
         "count": result[0],
         "offset": request.args.get('offset'),
         "limit": request.args.get('limit'),
+        "company": request.args.get('company'),
+        "factory": request.args.get('factory'),
+        "name": request.args.get('name'),
+        "category": request.args.get('category'),
         "stock": result[1]
     })
 
 
 @app.route('/stock/', methods=['GET', 'POST'])
 def stock():
+    if 'username' not in session:
+        username = None
+        user_authority = '0'
+    else:
+        username = session['username']
+        user_authority = handle.get_user_authority(username)
     form = Buy_stock()
     id = request.args.get('id')
     stock = handle.get_stock(user_id=id)
@@ -120,7 +138,8 @@ def stock():
             image="{}{}".format(
                 "", handle.get_stock_cover(request.args.get('id'))),
             stock_id=request.args.get('id'),
-            username=session['username'],
+            username=username,
+            user_authority=user_authority,
             stock_order_buy=stock_order_buy)
     else:
         return redirect(url_for('index'))
@@ -291,12 +310,16 @@ def add_Magnet():
         return jsonify({
             "msg": msg
         })
+    else:
+        return jsonify({
+            "msg": "必须登录才可以提交"
+        })
     pass
 
 
 @app.route('/api/Magnet/', methods=['GET'])
 def get_Magnet():
-    print(request.args.get('stock_id'))
+    # print(request.args.get('stock_id'))
     magnet = handle.getMagenet(stock_id=request.args.get('stock_id'))
     return jsonify({
         "msg": 'ok',

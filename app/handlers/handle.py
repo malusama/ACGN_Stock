@@ -7,7 +7,8 @@ from app.models import (
     Stock_order,
     Post,
     Stock_apply,
-    Stock_Magnet
+    Stock_Magnet,
+    Stock_Tag
 )
 from .base import (
     check_args
@@ -51,7 +52,8 @@ def register(user, password, email):
     return True
 
 
-def get_stock(user_id=None, limit=None, offset=None, order=None):
+def get_stock(user_id=None, limit=None, offset=None, order=None,
+              company=None, factory=None, name=None, category=None):
     if limit is None:
         limit = 50
     if offset is None:
@@ -63,6 +65,14 @@ def get_stock(user_id=None, limit=None, offset=None, order=None):
     #     return [json.loads(content)[0], json.loads(content)[1]]
     session = DBSession()
     query_stock = session.query(Stock)
+    if category:
+        query_stock = query_stock.filter(Stock.category.in_(category))
+    if company:
+        query_stock = query_stock.filter(Stock.company == company)
+    if factory:
+        query_stock = query_stock.filter(Stock.factory == factory)
+    if name:
+        query_stock = query_stock.filter(Stock.name.like(name))
     if user_id:
         return query_stock.filter(Stock.id == user_id)
     count = query_stock.count()
@@ -232,7 +242,7 @@ def buy_stock(stock_id=None, order_number=None,
                         if stock_order and \
                                 stock_order.stock_price >= order_price and \
                                 stock_order.stock_number <= order_number:
-                            print(stock_order.stock_price)
+                            # print(stock_order.stock_price)
                             user.currency = user.currency + \
                                 (order_number * order_price * Tax)
 
@@ -274,7 +284,7 @@ def buy_stock(stock_id=None, order_number=None,
                             session.commit()
                             order_number = 0
                         else:
-                            print(order_number)
+                            # print(order_number)
                             sub = Stock_order(
                                 user_id=user.id,
                                 stock_id=stock_id,
@@ -427,7 +437,7 @@ def get_user_authority(username):
     session = DBSession()
     user = session.query(User).filter(User.nickname == username).first()
     if not user:
-        return "没有用户"
+        return "-1"
     else:
         return str(user.authority)
 
@@ -504,7 +514,15 @@ def addMagnet(stock_id, Magnet, user_id):
 
 @check_args
 def get_stock_info(stock_id):
+    # print(stock_id)
     session = DBSession()
     stock = session.query(Stock).filter(Stock.id == stock_id).first()
+    tag = []
+    for i in stock.category.split(","):
+        tag.append(session.query(Stock_Tag).filter(
+            Stock_Tag.id == i).first().tag)
     session.close()
-    return stock.to_json()
+    stock_json = stock.to_json()
+    stock_json['category_name'] = ",".join(i for i in tag)
+    # print("类型:{}".format(stock_json['category']))
+    return stock_json
