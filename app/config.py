@@ -8,6 +8,8 @@ redis_client = redis.Redis(host='localhost', port=6379,
 REQUEST_CACHE_TIMEOUT = 60 * 10  # 30 mitute
 
 
+
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 DEBUG = True
 

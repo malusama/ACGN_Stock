@@ -25,6 +25,7 @@
       .Top-bar a{
 
       }
+
   </style>
   <head>
     {% if title %}
@@ -47,6 +48,8 @@
             <a href="{{ url_for('login') }}">Sign in</a>
             <a href="{{ url_for('register') }}">Register</a>
         {% endif %}
+        
+        
     </div>
     <hr>
     {% with messages = get_flashed_messages() %}

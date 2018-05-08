@@ -5,7 +5,7 @@
 #works{
   display: inline-block;
   border-width: 1px;
-  width: 400px;
+  width: 250px;
   
   transition: all 0.2s;/*图片放大过程的时间*/
   background-color: #f05b72;
@@ -17,8 +17,8 @@
   box-shadow:0px 0px 15px #26A65B;
 }
 #works img{
-  width: 400px;
-  height: 300px;
+  width: 250px;
+  height: 150px;
   border-radius: 5px;
 }
 #stock{
@@ -37,7 +37,36 @@
   overflow: hidden;
   background-color: #fffef9;
 }
+.search {
+  /*border-style: solid;*/
+  height: 30px;
+  width: 30%;
+  position: absolute;
+  text-align: center;
+  display: inline-block;
+  right: 5%;
+  top: 10px;
+}
+.search input{
+  height: 35px;
+  width: 300px;
+  border-radius: 25px;
+  border-style: solid;
+  border-color: #45b97c;
+  border-width: 1px;
+
+}
+.search input:focus {
+  border-color: #d71345;
+  border-width: 1px;
+  border-style: solid;
+  outline: none;
+}
 </style> 
+<div class="search">
+  <input type="string" name="search" v-model="keywords" @keyup.enter="search(keywords)">
+  <!-- <button v-on:click="search(keywords)">Search</button> -->
+</div>
 <div id="stock" >
 	<div id ='works' v-for="iter in stock_json"  v-on:click="sclick(iter.id)">
 		<img :src="iter.cover">
@@ -47,8 +76,38 @@
     <p v-model="offset" v-on:click="stock(Number(offset) + 24, 24)">下一页</p>
   </div>
 </div>
-
-<script>  
+<script>
+var search = new Vue({
+  el: ".search",
+  data: {
+    keywords: ''
+  },
+  delimiters: ['[[', ']]'],
+  methods: {
+    search(keywords) {
+      window.location.href="/stock_change/?name="+keywords;
+      // var _this = stock;
+      // axios.get("/api/stock_change/", {
+      //   params: {
+      //     name: keywords
+      //   }
+      // }).then(function(response) {
+      //   stock.msg = response.data.msg;
+      //   stock.limit = response.data.limit;
+      //   stock.offset = response.data.offset;
+      //   stock.offset = response.data.offset;
+      //   stock.count = response.data.count;
+      //   stock.stock_temp = response.data.stock
+      // }).then(function() {
+      //   var stock_len = stock.stock_temp.length;
+      //   _this.stock_json = []
+      //   for (var i = 0; i < stock_len; i++) {
+      //     _this.stock_json.push(stock.stock_temp[i])
+      //   }
+      // })
+    }
+  }
+});
 var stock = new Vue({
   el: '#stock',
   data: {
@@ -64,7 +123,8 @@ var stock = new Vue({
          axios.get('/api/stock_change/',{params:{limit:24, offset:0,
           factory:getQueryVariable("factory"),
           company:getQueryVariable("company"),
-          category:getQueryVariable("category")
+          category:getQueryVariable("category"),
+          name:getQueryVariable("name")
         }}).then(function(response) { 
          	stock.msg = response.data.msg;
           stock.limit = response.data.limit;
