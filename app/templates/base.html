@@ -1,6 +1,7 @@
 <html>
   <script src="https://unpkg.com/axios@0.17.1/dist/axios.min.js"></script>
   <script src="{{ url_for('static', filename='vue.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='baidu.js') }}"></script>
   <style type="text/css">
       body {
         font-family: "-apple-system", "BlinkMacSystemFont", 'Helvetica Neue', Helvetica, 'Nimbus Sans L', Arial, 'Liberation Sans', 'Hiragino Sans GB', 'Source Han Sans CN Normal', 'Microsoft YaHei', '微软雅黑', 'Wenquanyi Micro Hei', 'WenQuanYi Zen Hei', 'ST Heiti', "SimHei", 'WenQuanYi Zen Hei Sharp';
@@ -61,14 +62,4 @@
     {% endwith %}
     {% block content %}{% endblock %}
   </body>
-<script>
-var _hmt = _hmt || [];
-(function() {
-  var hm = document.createElement("script");
-  hm.src = "https://hm.baidu.com/hm.js?5ec26871c80d029485848dc4fa12d2f9";
-  var s = document.getElementsByTagName("script")[0]; 
-  s.parentNode.insertBefore(hm, s);
-})();
-</script>
-
 </html>
