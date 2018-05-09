@@ -29,7 +29,7 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
     #     return [json.loads(content)[0], json.loads(content)[1]]
     session = base.DBSession()
     query_stock = session.query(Stock)
-    if category:
+    if category and query_stock.filter(Stock.category.isnot(None)):
         query_stock = query_stock.filter(Stock.category.op(
             "~*")('(^|,).?({}).*?(,|$)'.format(category)))
     if company:
@@ -78,21 +78,30 @@ def get_user_stock(username=None):
 def get_stock_cover(stock_id):
     session = base.DBSession()
     cover = session.query(Stock).filter(
-        Stock.id == stock_id).first()
-    return cover.cover
+        Stock.id == stock_id).one_or_none()
+    if cover:
+        return cover.cover
 
 
 @check_args
 def get_stock_info(stock_id):
     # print(stock_id)
     session = base.DBSession()
-    stock = session.query(Stock).filter(Stock.id == stock_id).first()
+    stock = session.query(Stock).filter(Stock.id == stock_id).one_or_none()
     tag = []
-    for i in stock.category.split(","):
-        tag.append(session.query(Stock_Tag).filter(
-            Stock_Tag.id == i).first().tag)
-    session.close()
-    stock_json = stock.to_json()
-    stock_json['category_name'] = ",".join(i for i in tag)
-    # print("类型:{}".format(stock_json['category']))
-    return stock_json
+    if stock:
+        stock_json = stock.to_json()
+        if stock.category is not '':
+            for i in stock.category.split(","):
+                tag.append(session.query(Stock_Tag).filter(
+                    Stock_Tag.id == i).one_or_none().tag)
+
+            stock_json['category_name'] = ",".join(i for i in tag)
+            print("类型:{}".format(stock_json['category']))
+            pass
+        else:
+            stock_json['category_name'] = None
+        session.close()
+        return stock_json
+    else:
+        return
