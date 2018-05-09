@@ -4,31 +4,16 @@ import gevent
 import logging
 import functools
 import redis
-import json
-# from tasks import worker
 
 
+logger = logging.getLogger("test")
 redis_client = redis.Redis(host='localhost', port=6379,
                            db=1, decode_responses=True)
-
-
 BTSO_URL = 'https://btso.pw/search/'
-DMM_URL = 'http://www.dmm.co.jp/digital/anime/-/list/=/sort=ranking/'
-logger = logging.getLogger("test")
-
-
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) ' \
     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
 Accept_Language = 'zh-CN,zh;q=0.9,zh-TW;q=0.8,ja;q=0.7'
-Accept_Encoding = 'zip, deflate, br'
-Accept = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
-Referer = 'https://btso.pw/search/'
-Cache_Control = 'max-age=0'
-Host = 'Host'
-
-
-REQUEST_CACHE_TIMEOUT = 30 * 60 * 60 * 24  # 30 days
-proxies = {"http": "socks5://127.0.0.1:10010"}
+REQUEST_CACHE_TIMEOUT = 60 * 60 * 24  # 1 days
 
 
 def pq(content):
@@ -70,21 +55,12 @@ def get_web_page(url, timeout=15):
         except requests.exceptions.ConnectionError:
             # NOTE: do not raise and not retry
             pass
-        logger.warning('Get web page {} error {}'.format(url, resp.status_code))
+        logger.warning('Get web page {} error {}'.format(
+            url, resp.status_code))
 
 
-def get_anime_link():
-    anime_link = []
-    # session = models.DBSession()
-    for i in range(1, 18):
-        html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
-        for i in html("#list li .tmb a").items():
-            # print(i.attr("href").split()[0])
-            worker.delay(i.attr("href"))
-
-
-def btsoSearch(keyworks):
-    html = pq(get_web_page("{}{}".format(BTSO_URL,keyworks)))
+def btsoSearch(keywords):
+    html = pq(get_web_page("{}{}".format(BTSO_URL, keywords)))
     link = [i.attr("href") for i in html(".data-list a").items()]
     magnet = []
     for i in link[0:5]:
@@ -93,13 +69,8 @@ def btsoSearch(keyworks):
         info['magnet'] = html("#magnetLink").text()
         info['name'] = html("h3").text()
         info['ContentSize'] = html(".data-list .col-md-10").eq(2).text()
-        info['ConvertOn'] =  html(".data-list .col-md-10").eq(3).text()
-        
-        magnet.append(info)
-    
-    return magnet
-    # return link
+        info['ConvertOn'] = html(".data-list .col-md-10").eq(3).text()
 
-if __name__ == '__main__':
-    get_anime_link()
-    
+        magnet.append(info)
+
+    return magnet

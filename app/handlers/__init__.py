@@ -13,4 +13,5 @@ from .stock_order import *  # noqa
 from .stock import *  # noqa
 from .user import *  # noqa
 from .bank import *  # noqa
+from .btso import *  # noqa
 from .base import *  # noqa
