@@ -9,7 +9,9 @@ from celery import Celery
 import sys
 sys.path.append('../')
 from models import (
-    models
+    Stock,
+    Stock_Tag,
+    base
 )
 app = Celery('tasks', broker='redis://localhost:6379/3')
 redis_client = redis.Redis(host='localhost', port=6379,
@@ -18,10 +20,11 @@ redis_client = redis.Redis(host='localhost', port=6379,
 DMM_URL = 'http://www.dmm.co.jp/digital/anime/-/list/=/sort=ranking/'
 logger = logging.getLogger("test")
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) ' \
-             'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'
+             'AppleWebKit/537.36 (KHTML, like Gecko)'\
+             ' Chrome/61.0.3163.100 Safari/537.36'
 
 REQUEST_CACHE_TIMEOUT = 30 * 60 * 60 * 24  # 30 days
-proxies = { "http": "socks5://127.0.0.1:10010"}
+proxies = {"http": "socks5://127.0.0.1:10010"}
 
 
 def pq(content):
@@ -68,6 +71,12 @@ def get_web_page(url, timeout=15):
 
 
 @app.task
+def test(args):
+    print("time:{}".format(args))
+    pass
+
+
+@app.task
 def worker(url):
     print(url)
     # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
@@ -96,33 +105,35 @@ def worker(url):
         Introduction,
         Screenshots
     ))
-    session = models.DBSession()
+    session = base.DBSession()
 
-    if session.query(models.Stock).filter(models.Stock.name == works_name).first():
+    if session.query(Stock).filter(Stock.name == works_name).first():
         print("已经存在")
     else:
         tag = []
         for i in category:
-            if session.query(models.Stock_Tag).filter(models.Stock_Tag.tag == i).first() is None:
-                sub = models.Stock_Tag(tag=i)
+            if session.query(Stock_Tag).filter(
+                    Stock_Tag.tag == i).one_or_none() is None:
+                sub = Stock_Tag(tag=i)
                 session.add(sub)
                 session.commit()
-            tag.append(session.query(models.Stock_Tag).filter(models.Stock_Tag.tag == i).first().id)
-    
-    if session.query(models.Stock).filter(models.Stock.name == works_name).first():
+            tag.append(session.query(Stock_Tag).filter(
+                Stock_Tag.tag == i).first().id)
+
+    if session.query(Stock).filter(Stock.name == works_name).first():
         print("已经存在")
     else:
-        sub = models.Stock(name=works_name,
-                           introduction=Introduction,
-                           cover=cover,
-                           release_time=release_time,
-                           length_time=length_time,
-                           works_series=works_series,
-                           company=company,
-                           factory=factory,
-                           category=",".join(str(i) for i in tag),
-                           screenshots=",".join(i for i in Screenshots)
-                           )
+        sub = Stock(name=works_name,
+                    introduction=Introduction,
+                    cover=cover,
+                    release_time=release_time,
+                    length_time=length_time,
+                    works_series=works_series,
+                    company=company,
+                    factory=factory,
+                    category=",".join(str(i) for i in tag),
+                    screenshots=",".join(i for i in Screenshots)
+                    )
         session.add(sub)
         session.commit()
         print("插入成功")

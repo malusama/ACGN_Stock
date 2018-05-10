@@ -100,7 +100,7 @@ def get_stock_info(stock_id):
             print("类型:{}".format(stock_json['category']))
             pass
         else:
-            stock_json['category_name'] = None
+            stock_json['category_name'] = ''
         session.close()
         return stock_json
     else:

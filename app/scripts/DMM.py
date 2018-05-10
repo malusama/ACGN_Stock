@@ -5,7 +5,7 @@ import logging
 import functools
 import redis
 import json
-# from tasks import worker
+from celery_app import DMM_Storage
 
 
 redis_client = redis.Redis(host='localhost', port=6379,
@@ -70,21 +70,22 @@ def get_web_page(url, timeout=15):
         except requests.exceptions.ConnectionError:
             # NOTE: do not raise and not retry
             pass
-        logger.warning('Get web page {} error {}'.format(url, resp.status_code))
+        logger.warning('Get web page {} error'.format(
+            url))
 
 
 def get_anime_link():
     anime_link = []
     # session = models.DBSession()
-    for i in range(1, 18):
+    for i in range(1, 2):
         html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
         for i in html("#list li .tmb a").items():
             # print(i.attr("href").split()[0])
-            worker.delay(i.attr("href"))
+            DMM_Storage.worker.delay(i.attr("href"))
 
 
 def btsoSearch(keyworks):
-    html = pq(get_web_page("{}{}".format(BTSO_URL,keyworks)))
+    html = pq(get_web_page("{}{}".format(BTSO_URL, keyworks)))
     link = [i.attr("href") for i in html(".data-list a").items()]
     magnet = []
     for i in link[0:5]:
@@ -93,13 +94,12 @@ def btsoSearch(keyworks):
         info['magnet'] = html("#magnetLink").text()
         info['name'] = html("h3").text()
         info['ContentSize'] = html(".data-list .col-md-10").eq(2).text()
-        info['ConvertOn'] =  html(".data-list .col-md-10").eq(3).text()
-        
+        info['ConvertOn'] = html(".data-list .col-md-10").eq(3).text()
+
         magnet.append(info)
-    
+
     return magnet
     # return link
 
 if __name__ == '__main__':
     get_anime_link()
-    
