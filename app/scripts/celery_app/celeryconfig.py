@@ -15,7 +15,7 @@ CELERY_TIMEZONE = 'Asia/Shanghai'    # 指定时区，不指定默认为 'UTC'
 CELERY_IMPORTS = (
     'celery_app.DMM',
     'celery_app.DMM_Storage',
-    'celery_app.bangumi_Srotage'
+    'celery_app.bangumi_Storage'
 )
 
 # schedules
