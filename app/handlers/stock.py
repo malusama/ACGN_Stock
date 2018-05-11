@@ -7,6 +7,7 @@ from app.models import (
     Bank,
     Stock_Tag
 )
+import datetime
 from .base import (
     check_args
 )
@@ -17,7 +18,8 @@ from app.config import (
 
 
 def get_stock(user_id=None, limit=None, offset=None, order=None,
-              company=None, factory=None, name=None, category=None):
+              company=None, factory=None, name=None, category=None,
+              date_start=None, date_end=None):
     if limit is None:
         limit = 50
     if offset is None:
@@ -40,6 +42,14 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
         query_stock = query_stock.filter(Stock.name.like("%{}%".format(name)))
     if user_id:
         return query_stock.filter(Stock.id == user_id)
+    if date_start:
+        date_start = datetime.date(year=int(date_start.split('-')[0]),
+                                   month=int(date_start.split('-')[1]),
+                                   day=1)
+        print(date_start)
+        pass
+    if date_end:
+        pass
     count = query_stock.count()
     res = []
     stock = query_stock.offset(offset).limit(limit)

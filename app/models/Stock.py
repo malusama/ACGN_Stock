@@ -17,7 +17,7 @@ class Stock(Base):
 
     user_id = Column(String(255), default=None)
     works_series = Column(Text, default='')
-    release_time = Column(String(255), default=None)
+    release_time = Column(DateTime, default=datetime.datetime(1980, 1, 1))
     length_time = Column(String(255), default=None)
     company = Column(String(255), default=None)
     factory = Column(String(255), default=None)

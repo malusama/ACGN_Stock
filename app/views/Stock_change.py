@@ -47,7 +47,9 @@ def get_stock_change():
                                 name=request.args.get('name'),
                                 company=request.args.get('company'),
                                 factory=request.args.get('factory'),
-                                category=request.args.get('category')
+                                category=request.args.get('category'),
+                                date_start=request.args.get('date_start'),
+                                date_end=request.args.get('date_end')
                                 )
     return jsonify({
         "msg": "tset",
@@ -58,5 +60,7 @@ def get_stock_change():
         "factory": request.args.get('factory'),
         "name": request.args.get('name'),
         "category": request.args.get('category'),
+        "date_start": request.args.get('date_start'),
+        "date_end": request.args.get('date_end'),
         "stock": result[1]
     })

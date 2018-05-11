@@ -1,0 +1,12 @@
+ALTER TABLE stock
+	ADD updated_at TIMESTAMP  DEFAULT now() NOT NULL;
+ALTER TABLE bank
+	ADD updated_at TIMESTAMP  DEFAULT now() NOT NULL;
+ALTER TABLE posts
+	ADD updated_at TIMESTAMP  DEFAULT now() NOT NULL;
+ALTER TABLE stock_apply
+	ADD updated_at TIMESTAMP  DEFAULT now() NOT NULL;
+ALTER TABLE stock_order
+	ADD updated_at TIMESTAMP  DEFAULT now() NOT NULL;
+ALTER TABLE users
+	ADD updated_at TIMESTAMP  DEFAULT now() NOT NULL;

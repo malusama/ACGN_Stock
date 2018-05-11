@@ -5,7 +5,7 @@ import logging
 import functools
 import redis
 import json
-from celery_app.DMM_Stotage import (
+from celery_app.DMM_Storage import (
     worker
 )
 from celery_app import app
@@ -63,7 +63,7 @@ def get_web_page(url, timeout=15):
         session.headers['User-Agent'] = USER_AGENT
         session.headers['Accept-Language'] = Accept_Language
         try:
-            resp = session.get(url, timeout=timeout)
+            resp = session.get(url, timeout=timeout, proxies=proxies)
             if resp.status_code == 200:
                 logger.warning('missing cache for url: {}'.format(url))
                 content = resp.content

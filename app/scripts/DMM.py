@@ -60,7 +60,7 @@ def get_web_page(url, timeout=15):
         session.headers['User-Agent'] = USER_AGENT
         session.headers['Accept-Language'] = Accept_Language
         try:
-            resp = session.get(url, timeout=timeout)
+            resp = session.get(url, timeout=timeout, proxies=proxies)
             if resp.status_code == 200:
                 logger.warning('missing cache for url: {}'.format(url))
                 content = resp.content
@@ -77,7 +77,7 @@ def get_web_page(url, timeout=15):
 def get_anime_link():
     anime_link = []
     # session = models.DBSession()
-    for i in range(1, 2):
+    for i in range(1, 18):
         html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
         for i in html("#list li .tmb a").items():
             # print(i.attr("href").split()[0])
