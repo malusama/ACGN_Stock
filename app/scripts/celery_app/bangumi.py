@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import requests
 from pyquery import PyQuery
 import gevent
@@ -48,9 +49,9 @@ def retry(times=3):
                     gevent.sleep(3)
                 else:
                     break
-        
+
         return wrapper
-    
+
     return deco
 
 
@@ -91,14 +92,14 @@ def worker(url):
     # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
     html = pq(get_web_page(url))
     works_name = html("h1 > a").text()
-    release_time = html("#infobox > li") # .eq(3).text().split(':')[1]
+    release_time = html("#infobox > li")  # .eq(3).text().split(':')[1]
     if release_time.eq(3).text().split(":")[0] == "上映年度":
         release_time = release_time.eq(3).text().split(":")[1]
     elif release_time.eq(2).text().split(":")[0] == "上映年度":
         release_time = release_time.eq(2).text().split(":")[1]
     else:
         release_time = "1980年1月1日"
-        
+
     year = int(release_time.split("年")[0])
     month = int(release_time.split("年")[1].split("月")[0])
     day = int(release_time.split("年")[1].split("月")[1].split("日")[0])
@@ -122,17 +123,17 @@ def worker(url):
     # except ValueError:
     #     day = int(release_time[2].split(' ')[0])
     print("作品名：{},\n发布时间:{}, \n公司：{}, \ntag:{}, \ncover:{}".format(
-            works_name,
-            release_time,
-            # length_time,
-            # works_series,
-            company,
-            # factory,
-            category,
-            cover
-            # Introduction,
-            # Screenshots
-        ))
+        works_name,
+        release_time,
+        # length_time,
+        # works_series,
+        company,
+        # factory,
+        category,
+        cover
+        # Introduction,
+        # Screenshots
+    ))
     session = base.DBSession()
 
     if session.query(Stock).filter(Stock.name == works_name).first():
@@ -141,13 +142,12 @@ def worker(url):
         tag = []
         for i in category:
             if session.query(Stock_Tag).filter(
-                            Stock_Tag.tag == i).one_or_none() is None:
+                    Stock_Tag.tag == i).one_or_none() is None:
                 sub = Stock_Tag(tag=i)
                 session.add(sub)
                 session.commit()
             tag.append(session.query(Stock_Tag).filter(
                 Stock_Tag.tag == i).first().id)
-
 
         sub = Stock(name=works_name,
                     # introduction=Introduction,

@@ -5,6 +5,7 @@ import logging
 import functools
 import redis
 from celery import Celery
+import datetime
 
 import sys
 sys.path.append('../')
@@ -70,70 +71,96 @@ def get_web_page(url, timeout=15):
         logger.warning('Get web page {} error'.format(url))
 
 
-@app.task
-def test(args):
-    print("time:{}".format(args))
-    pass
+def get_anime_link():
+    anime_link = []
+    # session = models.DBSession()
+    for i in range(1, 18):
+        html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
+        for i in html("#list li .tmb a").items():
+            # print(i.attr("href").split()[0])
+            worker(i.attr("href"))
 
 
 @app.task
 def worker(url):
-    print(url)
+    # print(url)
     # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
     html = pq(get_web_page(url))
     works_name = html(".hreview h1").text()
-    release_time = html(".mg-b20 tr").eq(2)("td").eq(1).text()
+    release_time = html(".mg-b20 tr").eq(2)("td").eq(1).text().split('/')
     length_time = html(".mg-b20 tr").eq(3)("td").eq(1).text()
     works_series = html(".mg-b20 tr").eq(4)("td").eq(1).text()
     company = html(".mg-b20 tr").eq(5)("td").eq(1).text()
     factory = html(".mg-b20 tr").eq(6)("td").eq(1).text()
     category = html(".mg-b20 tr").eq(7)("td").eq(1).text().split()[1:-1]
-    cover = "https://{}".format(
-        html("#sample-video a").attr("href").split('://')[1])
+    cover = html("#sample-video > a")
+    if cover:
+        try:
+            cover = "https://{}".format(cover.attr("href").split('://')[1])
+        except IndexError:
+            print(url)
+            print(cover)
+            cover = 'https://malu-picture.oss-cn-beijing.aliyuncs.com/18-5-11/3774354.jpg'
+    
+    else:
+        cover = html("#sample-video  > img")
+        cover = "https://{}".format(cover.attr("src").split('://')[1])
     Introduction = html(".lh4").text()
     Screenshots = ["https://{}".format(i.attr("src").split("://")[1])
                    for i in html("#sample-image-block img").items()]
-    print("作品名：{},\n发布时间:{}，\n影片时长:{}，\n影片系列：{}，\n公司：{}，\n厂商：{}，\n类别：{}, \ncover:{}, \n简介:{}, \n截图:{}".format(
-        works_name,
-        release_time,
-        length_time,
-        works_series,
-        company,
-        factory,
-        category,
-        cover,
-        Introduction,
-        Screenshots
-    ))
-    session = base.DBSession()
+    try:
+        year = int(release_time[0])
+        month = int(release_time[1])
+        day = int(release_time[2])
+    except ValueError:
+        day = int(release_time[2].split(' ')[0])
+    # print("作品名：{},\n发布时间:{}，\n影片时长:{}，\n影片系列：{}，\n公司：{}，\n厂商：{}，\n类别：{}, \ncover:{}, \n简介:{}, \n截图:{}".format(
+    #     works_name,
+    #     release_time,
+    #     length_time,
+    #     works_series,
+    #     company,
+    #     factory,
+    #     category,
+    #     cover,
+    #     Introduction,
+    #     Screenshots
+    # ))
+    # session = base.DBSession()
 
-    if session.query(Stock).filter(Stock.name == works_name).first():
-        print("已经存在")
-    else:
-        tag = []
-        for i in category:
-            if session.query(Stock_Tag).filter(
-                    Stock_Tag.tag == i).one_or_none() is None:
-                sub = Stock_Tag(tag=i)
-                session.add(sub)
-                session.commit()
-            tag.append(session.query(Stock_Tag).filter(
-                Stock_Tag.tag == i).first().id)
+    # if session.query(Stock).filter(Stock.name == works_name).first():
+    #     print("已经存在")
+    # else:
+    #     tag = []
+    #     for i in category:
+    #         if session.query(Stock_Tag).filter(
+    #                 Stock_Tag.tag == i).one_or_none() is None:
+    #             sub = Stock_Tag(tag=i)
+    #             session.add(sub)
+    #             session.commit()
+    #         tag.append(session.query(Stock_Tag).filter(
+    #             Stock_Tag.tag == i).first().id)
+    #
+    # if session.query(Stock).filter(Stock.name == works_name).first():
+    #     print("已经存在")
+    # else:
+    #     sub = Stock(name=works_name,
+    #                 introduction=Introduction,
+    #                 cover=cover,
+    #                 release_time=datetime.datetime(
+    #                     int(release_time[0]), int(release_time[1]), int(release_time[2])),
+    #                 length_time=length_time,
+    #                 works_series=works_series,
+    #                 company=company,
+    #                 factory=factory,
+    #                 category=",".join(str(i) for i in tag),
+    #                 screenshots=",".join(i for i in Screenshots)
+    #                 )
+    #     session.add(sub)
+    #     session.commit()
+    #     print("插入成功")
 
-    if session.query(Stock).filter(Stock.name == works_name).first():
-        print("已经存在")
-    else:
-        sub = Stock(name=works_name,
-                    introduction=Introduction,
-                    cover=cover,
-                    release_time=release_time,
-                    length_time=length_time,
-                    works_series=works_series,
-                    company=company,
-                    factory=factory,
-                    category=",".join(str(i) for i in tag),
-                    screenshots=",".join(i for i in Screenshots)
-                    )
-        session.add(sub)
-        session.commit()
-        print("插入成功")
+
+if __name__ == '__main__':
+    # worker('http://www.dmm.co.jp/digital/anime/-/detail/=/cid=h_511elu00003n/?i3_ref=list&i3_ord=112')
+    get_anime_link()

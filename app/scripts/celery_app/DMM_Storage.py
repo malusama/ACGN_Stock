@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import requests
 from pyquery import PyQuery
 import gevent
@@ -132,7 +133,7 @@ def worker(url):
                 session.commit()
             tag.append(session.query(Stock_Tag).filter(
                 Stock_Tag.tag == i).first().id)
-            
+
         try:
             year = int(release_time[0])
             month = int(release_time[1])
@@ -156,4 +157,3 @@ def worker(url):
         session.add(sub)
         session.commit()
         print("插入成功")
-

@@ -48,7 +48,7 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
                                    month=int(date_start.split('-')[1]),
                                    day=1)
         query_stock = query_stock.filter(Stock.release_time > date_start)
-        print(date_start)
+        # print(date_start)
         pass
     if date_end:
         pass
