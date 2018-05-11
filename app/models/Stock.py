@@ -37,7 +37,7 @@ class Stock(Base):
             'introduction': self.introduction,
             'cover': self.cover,
             'works_series': self.works_series,
-            'release_time': self.release_time,
+            'release_time': self.release_time.strftime('%Y-%m-%d'),
             'length_time': self.length_time,
             'company': self.company,
             'factory': self.factory,

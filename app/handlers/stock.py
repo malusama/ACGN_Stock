@@ -29,6 +29,7 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
     #         user_id, limit, offset, order))
     # if content:
     #     return [json.loads(content)[0], json.loads(content)[1]]
+
     session = base.DBSession()
     query_stock = session.query(Stock)
     if category and query_stock.filter(Stock.category.isnot(None)):
@@ -46,6 +47,7 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
         date_start = datetime.date(year=int(date_start.split('-')[0]),
                                    month=int(date_start.split('-')[1]),
                                    day=1)
+        query_stock = query_stock.filter(Stock.release_time > date_start)
         print(date_start)
         pass
     if date_end:

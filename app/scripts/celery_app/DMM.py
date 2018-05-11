@@ -80,7 +80,7 @@ def get_web_page(url, timeout=15):
 @app.task
 def get_anime_link():
     # session = models.DBSession()
-    for i in range(1, 2):
+    for i in range(1, 18):
         html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
         for i in html("#list li .tmb a").items():
             # print(i.attr("href").split()[0])
