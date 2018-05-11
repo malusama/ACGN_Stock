@@ -87,7 +87,7 @@ def get_anime_link():
 
 @app.task
 def worker(url):
-    # print(url)
+    print(url)
     # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
     html = pq(get_web_page(url))
     works_name = html("h1 > a").text()
@@ -98,10 +98,15 @@ def worker(url):
         release_time = release_time.eq(2).text().split(":")[1]
     else:
         release_time = "1980年1月1日"
-
-    year = int(release_time.split("年")[0])
-    month = int(release_time.split("年")[1].split("月")[0])
-    day = int(release_time.split("年")[1].split("月")[1].split("日")[0])
+    try:
+        year = int(release_time.split("年")[0])
+        month = int(release_time.split("年")[1].split("月")[0])
+        day = int(release_time.split("年")[1].split("月")[1].split("日")[0])
+    except ValueError:
+        if len(release_time.split("-")) > 1:
+            year = int(release_time.split("-")[0])
+            month = int(release_time.split("-")[1])
+            day = int(release_time.split("-")[2])
     # length_time = html(".mg-b20 tr").eq(3)("td").eq(1).text()
     # works_series = html(".mg-b20 tr").eq(4)("td").eq(1).text()
     company = html("#infobox > li").eq(1).text().split(':')[1]
@@ -112,15 +117,6 @@ def worker(url):
         cover = "https:{}".format(cover("a").attr('href'))
     else:
         cover = "https://malu-picture.oss-cn-beijing.aliyuncs.com/18-5-11/3774354.jpg"
-    # Introduction = html(".lh4").text()
-    # Screenshots = ["https://{}".format(i.attr("src").split("://")[1])
-    #                for i in html("#sample-image-block img").items()]
-    # try:
-    #     year = int(release_time[0])
-    #     month = int(release_time[1])
-    #     day = int(release_time[2])
-    # except ValueError:
-    #     day = int(release_time[2].split(' ')[0])
     print("作品名：{},\n发布时间:{}, \n公司：{}, \ntag:{}, \ncover:{}".format(
         works_name,
         release_time,
@@ -165,5 +161,5 @@ def worker(url):
 
 
 if __name__ == '__main__':
-    # worker('http://bangumi.tv/subject/128131')
-    get_anime_link()
+    worker('http://bangumi.tv/subject/128131')
+    # get_anime_link()
