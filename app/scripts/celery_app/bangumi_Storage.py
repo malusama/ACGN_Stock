@@ -5,20 +5,18 @@ import gevent
 import logging
 import functools
 import redis
-from celery import Celery
-from celery_app import app
 import datetime
+from celery_app import app
+
 
 import sys
-
-sys.path.append('../../')
+sys.path.append('../')
 from models import (
     Stock,
     Stock_Tag,
     base
 )
 
-app = Celery('tasks', broker='redis://localhost:6379/3')
 redis_client = redis.Redis(host='localhost', port=6379,
                            db=1, decode_responses=True)
 
@@ -63,7 +61,7 @@ def get_web_page(url, timeout=15):
     with requests.Session() as session:
         session.headers['User-Agent'] = USER_AGENT
         try:
-            resp = session.get(url, timeout=timeout, proxies=proxies)
+            resp = session.get(url, timeout=timeout)
             if resp.status_code == 200:
                 logger.warning('missing cache for url: {}'.format(url))
                 content = resp.content

@@ -6,10 +6,7 @@ import logging
 import functools
 import redis
 import json
-from celery_app.bangumi_Storage import (
-    worker
-)
-from celery_app import app
+from celery_app import bangumi_Storage
 
 
 redis_client = redis.Redis(host='localhost', port=6379,
@@ -64,7 +61,7 @@ def get_web_page(url, timeout=15):
         session.headers['User-Agent'] = USER_AGENT
         session.headers['Accept-Language'] = Accept_Language
         try:
-            resp = session.get(url, timeout=timeout, proxies=proxies)
+            resp = session.get(url, timeout=timeout)
             if resp.status_code == 200:
                 logger.warning('missing cache for url: {}'.format(url))
                 content = resp.content
@@ -78,15 +75,14 @@ def get_web_page(url, timeout=15):
             url, resp.status_code))
 
 
-@app.task
+
 def get_anime_link():
     # session = models.DBSession()
     for i in range(1, 578):
         html = pq(get_web_page("{}{}/".format(BANGUMI_URL, i)))
         for i in html("#browserItemList > li").items():
             # print("http://bangumi.tv{}".format(i("a").attr("href")))
-            worker("http://bangumi.tv{}".format(i("a").attr("href")))
-            break
+            bangumi_Storage.worker.delay("http://bangumi.tv{}".format(i("a").attr("href")))
 
 
 def btsoSearch(keyworks):
