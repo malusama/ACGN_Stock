@@ -117,18 +117,18 @@ def worker(url):
         cover = "https:{}".format(cover("a").attr('href'))
     else:
         cover = "https://malu-picture.oss-cn-beijing.aliyuncs.com/18-5-11/3774354.jpg"
-    print("作品名：{},\n发布时间:{}, \n公司：{}, \ntag:{}, \ncover:{}".format(
-        works_name,
-        release_time,
-        # length_time,
-        # works_series,
-        company,
-        # factory,
-        category,
-        cover
-        # Introduction,
-        # Screenshots
-    ))
+    # print("作品名：{},\n发布时间:{}, \n公司：{}, \ntag:{}, \ncover:{}".format(
+    #     works_name,
+    #     release_time,
+    #     # length_time,
+    #     # works_series,
+    #     company,
+    #     # factory,
+    #     category,
+    #     cover
+    #     # Introduction,
+    #     # Screenshots
+    # ))
     session = base.DBSession()
 
     if session.query(Stock).filter(Stock.name == works_name).first():

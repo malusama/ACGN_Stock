@@ -62,6 +62,7 @@
   border-style: solid;
   border-color: #45b97c;
   border-width: 1px;
+  font-size: 18px;
 
 }
 .search input:focus {
@@ -182,7 +183,18 @@
 
 </div>
 <script>
-
+var search = new Vue({
+  el: ".search",
+  data: {
+    keywords: ''
+  },
+  delimiters: ['[[', ']]'],
+  methods: {
+    search(keywords) {
+      window.location.href="/stock_change/?name="+keywords;
+    }
+  }
+});
 var info = new Vue({
   el: '.works',
   data: {

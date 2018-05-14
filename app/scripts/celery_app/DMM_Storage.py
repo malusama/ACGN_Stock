@@ -85,7 +85,7 @@ def worker(url):
     works_series = html(".mg-b20 tr").eq(4)("td").eq(1).text()
     company = html(".mg-b20 tr").eq(5)("td").eq(1).text()
     factory = html(".mg-b20 tr").eq(6)("td").eq(1).text()
-    category = html(".mg-b20 tr").eq(7)("td").eq(1).text().split()[1:-1]
+    category = html(".mg-b20 tr").eq(7)("td").eq(1).text().split()
     cover = html("#sample-video > a")
     if cover:
         try:

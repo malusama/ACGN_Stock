@@ -7,7 +7,7 @@ from app.models import (
     Bank,
     Stock_Tag
 )
-import datetime
+from datetime import datetime, timedelta
 from .base import (
     check_args
 )
@@ -44,16 +44,24 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
     if user_id:
         return query_stock.filter(Stock.id == user_id)
     if date_start:
-        date_start = datetime.date(year=int(date_start.split('-')[0]),
-                                   month=int(date_start.split('-')[1]),
-                                   day=1)
-        query_stock = query_stock.filter(Stock.release_time > date_start)
-        # print(date_start)
-        pass
-    if date_end:
-        pass
+        date_start = datetime(year=int(date_start.split('-')[0]),
+                              month=int(date_start.split('-')[1]),
+                              day=1)
+        query_stock = query_stock.filter(
+            Stock.release_time > date_start.strftime("%Y-%m-%d"))
+        if date_end is None:
+            date_end = date_start + timedelta(days=30)
+            query_stock = query_stock.filter(Stock.release_time < date_end)
+        else:
+            date_end = datetime(year=int(date_end.split('-')[0]),
+                                month=int(date_end.split('-')[1]),
+                                day=1)
+            query_stock = query_stock.filter(
+                Stock.release_time < date_end.strftime("%Y-%m-%d"))
+
     count = query_stock.count()
     res = []
+    query_stock = query_stock.order_by(Stock.release_time.desc())
     stock = query_stock.offset(offset).limit(limit)
     for x in stock:
         res.append(x.to_json())
@@ -109,7 +117,7 @@ def get_stock_info(stock_id):
                     Stock_Tag.id == i).one_or_none().tag)
 
             stock_json['category_name'] = ",".join(i for i in tag)
-            print("类型:{}".format(stock_json['category']))
+            # print("类型:{}".format(stock_json['category']))
             pass
         else:
             stock_json['category_name'] = ''

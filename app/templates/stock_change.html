@@ -62,17 +62,25 @@
   border-style: solid;
   outline: none;
 }
+.search_time{
+  text-align: center;
+}
 </style> 
 <div class="search">
   <input type="string" name="search" v-model="keywords" @keyup.enter="search(keywords)">
+
   <!-- <button v-on:click="search(keywords)">Search</button> -->
+</div>
+<div class="search_time">
+  <input type="month" value="2015-09" v-model="keywords"/>
+  <button v-on:click="search(keywords)">Search</button>
 </div>
 <div id="stock" >
 	<div id ='works' v-for="iter in stock_json"  v-on:click="sclick(iter.id)">
 		<img :src="iter.cover">
 		<p>[[ iter.name ]]</p>
 	</div>
-  <div v-show="!(limit + offset) < count">
+  <div v-show="!((limit + offset) > count)">
     <p v-model="offset" v-on:click="stock(Number(offset) + 24, 24)">下一页</p>
   </div>
 </div>
@@ -86,28 +94,23 @@ var search = new Vue({
   methods: {
     search(keywords) {
       window.location.href="/stock_change/?name="+keywords;
-      // var _this = stock;
-      // axios.get("/api/stock_change/", {
-      //   params: {
-      //     name: keywords
-      //   }
-      // }).then(function(response) {
-      //   stock.msg = response.data.msg;
-      //   stock.limit = response.data.limit;
-      //   stock.offset = response.data.offset;
-      //   stock.offset = response.data.offset;
-      //   stock.count = response.data.count;
-      //   stock.stock_temp = response.data.stock
-      // }).then(function() {
-      //   var stock_len = stock.stock_temp.length;
-      //   _this.stock_json = []
-      //   for (var i = 0; i < stock_len; i++) {
-      //     _this.stock_json.push(stock.stock_temp[i])
-      //   }
-      // })
     }
   }
 });
+
+var search_time = new Vue({
+  el: ".search_time",
+  data: {
+    keywords: ''
+  },
+  delimiters: ['[[', ']]'],
+  methods: {
+    search(keywords) {
+      window.location.href="/stock_change/?date_start="+keywords;
+    }
+  }
+});
+
 var stock = new Vue({
   el: '#stock',
   data: {
@@ -124,7 +127,9 @@ var stock = new Vue({
           factory:getQueryVariable("factory"),
           company:getQueryVariable("company"),
           category:getQueryVariable("category"),
-          name:getQueryVariable("name")
+          name:getQueryVariable("name"),
+          date_start:getQueryVariable("date_start"),
+          date_end:getQueryVariable("date_end")
         }}).then(function(response) { 
          	stock.msg = response.data.msg;
           stock.limit = response.data.limit;
@@ -141,7 +146,10 @@ var stock = new Vue({
           axios.get('/api/stock_change/',{params:{limit:limit, offset:offset,
           factory:getQueryVariable("factory"),
           company:getQueryVariable("company"),
-          category:getQueryVariable("category")
+          category:getQueryVariable("category"),
+          name:getQueryVariable("name"),
+          date_start:getQueryVariable("date_start"),
+          date_end:getQueryVariable("date_end")
           }}).then(function(response) { 
             stock.msg = response.data.msg;
             stock.limit = response.data.limit;
