@@ -59,15 +59,17 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
             date_end = datetime(year=int(date_end.split('-')[0]),
                                 month=int(date_end.split('-')[1]),
                                 day=1)
-            query_stock = query_stock.filter(
-                Stock.release_time < date_end.strftime("%Y-%m-%d"))
+        query_stock = query_stock.filter(
+            Stock.release_time < date_end.strftime("%Y-%m-%d"))
 
     count = query_stock.count()
     res = []
     query_stock = query_stock.order_by(Stock.release_time.desc())
     stock = query_stock.offset(offset).limit(limit)
+
     for x in stock:
         res.append(x.to_json())
+
     redis_client.setex(
         "id{}limit{}offset{}order{}company{}"
         "factory{}name{}category{}date_start{}date_end{}".format(
