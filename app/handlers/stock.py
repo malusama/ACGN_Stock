@@ -15,6 +15,7 @@ from app.config import (
     redis_client,
     REQUEST_CACHE_TIMEOUT
 )
+import json
 
 
 def get_stock(user_id=None, limit=None, offset=None, order=None,
@@ -24,11 +25,13 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
         limit = 50
     if offset is None:
         offset = 0
-    # content = redis_client.get(
-    #     "id{}limit{}offset{}order{}".format(
-    #         user_id, limit, offset, order))
-    # if content:
-    #     return [json.loads(content)[0], json.loads(content)[1]]
+    content = redis_client.get(
+        "id{}limit{}offset{}order{}company{}"
+        "factory{}name{}category{}date_start{}date_end{}".format(
+            user_id, limit, offset, order, company, factory,
+            name, category, date_start, date_end))
+    if content:
+        return [json.loads(content)[0], json.loads(content)[1]]
 
     session = base.DBSession()
     query_stock = session.query(Stock)
@@ -51,7 +54,7 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
             Stock.release_time > date_start.strftime("%Y-%m-%d"))
         if date_end is None:
             date_end = date_start + timedelta(days=30)
-            query_stock = query_stock.filter(Stock.release_time < date_end)
+            # query_stock = query_stock.filter(Stock.release_time < date_end)
         else:
             date_end = datetime(year=int(date_end.split('-')[0]),
                                 month=int(date_end.split('-')[1]),
@@ -65,10 +68,13 @@ def get_stock(user_id=None, limit=None, offset=None, order=None,
     stock = query_stock.offset(offset).limit(limit)
     for x in stock:
         res.append(x.to_json())
-    # redis_client.setex("id{}limit{}offset{}order{}".format(
-    #     id, limit, offset, order),
-    #     json.dumps([count, res]),
-    #     REQUEST_CACHE_TIMEOUT)
+    redis_client.setex(
+        "id{}limit{}offset{}order{}company{}"
+        "factory{}name{}category{}date_start{}date_end{}".format(
+            user_id, limit, offset, order, company,
+            factory, name, category, date_start, date_end),
+        json.dumps([count, res]),
+        REQUEST_CACHE_TIMEOUT)
     return [count, res]
 
 
@@ -99,6 +105,7 @@ def get_stock_cover(stock_id):
     session = base.DBSession()
     cover = session.query(Stock).filter(
         Stock.id == stock_id).one_or_none()
+    session.close()
     if cover:
         return cover.cover
 

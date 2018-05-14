@@ -5,9 +5,7 @@ import redis
 
 redis_client = redis.Redis(host='localhost', port=6379,
                            db=0, decode_responses=True)
-REQUEST_CACHE_TIMEOUT = 60 * 10  # 30 mitute
-
-
+REQUEST_CACHE_TIMEOUT = 60 * 60 * 24   # 1 day
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
