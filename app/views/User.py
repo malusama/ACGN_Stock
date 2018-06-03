@@ -27,6 +27,7 @@ def user():
 
 @app.route('/api/user_id/', methods=['GET'])
 def get_userid():
+    print(session.items())
     if 'username' in session:
         username = session['username']
         userid = handlers.get_userid(username)

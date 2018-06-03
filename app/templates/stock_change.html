@@ -80,7 +80,8 @@
 		<img :src="iter.cover">
 		<p>[[ iter.name ]]</p>
 	</div>
-  <div v-show="!((limit + offset) > count)">
+  <div v-show='(Number(limit) + Number(offset)) < Number(count)'>
+  	<!-- <p>[[ (Number(limit) + Number(offset)) < Number(count) ]]  [[limit]] + [[Number(offset)]] [[count]]</p> -->
     <p v-model="offset" v-on:click="stock(Number(offset) + 24, 24)">下一页</p>
   </div>
 </div>
@@ -132,10 +133,11 @@ var stock = new Vue({
           date_end:getQueryVariable("date_end")
         }}).then(function(response) { 
          	stock.msg = response.data.msg;
-          stock.limit = response.data.limit;
-          stock.offset = response.data.offset;
-          stock.count = response.data.count;
-         	stock.stock_json = response.data.stock});
+            stock.limit = response.data.limit;
+            stock.offset = response.data.offset;
+            stock.count = response.data.count;
+         	stock.stock_json = response.data.stock;
+         });
     },
     methods: {
         sclick(id){  
@@ -154,10 +156,11 @@ var stock = new Vue({
             stock.msg = response.data.msg;
             stock.limit = response.data.limit;
             stock.offset = response.data.offset;
-            stock.offset = response.data.offset;
             stock.count = response.data.count;
             stock.stock_temp = response.data.stock;
-            console.log(stock.offset)
+            console.log(stock.offset);
+            console.log(stock.limit);
+            console.log(stock.count)
           }).then(function(){
             var stock_len = stock.stock_temp.length;
             for (var i = 0; i < stock_len; i++) {

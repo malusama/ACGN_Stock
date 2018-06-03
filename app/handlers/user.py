@@ -37,7 +37,7 @@ def register(user, password, email):
 def get_userid(username):
     if not username:
         raise ValueError
-    session = base.base.DBSession()
+    session = base.DBSession()
     user = session.query(User).filter(User.nickname == username).first()
     if not user:
         return "没有用户"

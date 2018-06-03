@@ -22,7 +22,7 @@ CELERY_IMPORTS = (
 CELERYBEAT_SCHEDULE = {
     'add-every-30-seconds': {
         'task': 'celery_app.DMM.get_anime_link',
-        'schedule': timedelta(seconds=30)       # 每 30 秒执行一次
+        'schedule': crontab(hour=30)       # 每 30 秒执行一次
         # 'args': (5, 8)                           # 任务函数参数
     }
 }

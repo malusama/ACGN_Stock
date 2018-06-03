@@ -74,8 +74,7 @@ def get_web_page(url, timeout=15):
         except requests.exceptions.ConnectionError:
             # NOTE: do not raise and not retry
             pass
-        logger.warning('Get web page {} error {}'.format(
-            url, resp.status_code))
+        logger.warning('Get web page {} error {}'.format(url))
 
 
 @app.task

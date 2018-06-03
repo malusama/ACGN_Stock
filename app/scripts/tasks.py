@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
 import requests
 from pyquery import PyQuery
 import gevent
 import logging
 import functools
 import redis
-from celery import Celery
 import datetime
+from celery_app import app
+
 
 import sys
 sys.path.append('../')
@@ -14,7 +16,8 @@ from models import (
     Stock_Tag,
     base
 )
-app = Celery('tasks', broker='redis://localhost:6379/3')
+
+
 redis_client = redis.Redis(host='localhost', port=6379,
                            db=1, decode_responses=True)
 
@@ -71,19 +74,9 @@ def get_web_page(url, timeout=15):
         logger.warning('Get web page {} error'.format(url))
 
 
-def get_anime_link():
-    anime_link = []
-    # session = models.DBSession()
-    for i in range(1, 18):
-        html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
-        for i in html("#list li .tmb a").items():
-            # print(i.attr("href").split()[0])
-            worker(i.attr("href"))
-
-
 @app.task
 def worker(url):
-    # print(url)
+    print(url)
     # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
     html = pq(get_web_page(url))
     works_name = html(".hreview h1").text()
@@ -92,7 +85,7 @@ def worker(url):
     works_series = html(".mg-b20 tr").eq(4)("td").eq(1).text()
     company = html(".mg-b20 tr").eq(5)("td").eq(1).text()
     factory = html(".mg-b20 tr").eq(6)("td").eq(1).text()
-    category = html(".mg-b20 tr").eq(7)("td").eq(1).text().split()[1:-1]
+    category = html(".mg-b20 tr").eq(7)("td").eq(1).text().split()
     cover = html("#sample-video > a")
     if cover:
         try:
@@ -101,7 +94,7 @@ def worker(url):
             print(url)
             print(cover)
             cover = 'https://malu-picture.oss-cn-beijing.aliyuncs.com/18-5-11/3774354.jpg'
-    
+
     else:
         cover = html("#sample-video  > img")
         cover = "https://{}".format(cover.attr("src").split('://')[1])
@@ -114,20 +107,20 @@ def worker(url):
         day = int(release_time[2])
     except ValueError:
         day = int(release_time[2].split(' ')[0])
-    # print("作品名：{},\n发布时间:{}，\n影片时长:{}，\n影片系列：{}，\n公司：{}，\n厂商：{}，\n类别：{}, \ncover:{}, \n简介:{}, \n截图:{}".format(
-    #     works_name,
-    #     release_time,
-    #     length_time,
-    #     works_series,
-    #     company,
-    #     factory,
-    #     category,
-    #     cover,
-    #     Introduction,
-    #     Screenshots
-    # ))
+    print("作品名：{},\n发布时间:{}，\n影片时长:{}，\n影片系列：{}，\n公司：{}，\n厂商：{}，\n类别：{}, \ncover:{}, \n简介:{}, \n截图:{}".format(
+        works_name,
+        release_time,
+        length_time,
+        works_series,
+        company,
+        factory,
+        category,
+        cover,
+        Introduction,
+        Screenshots
+    ))
     # session = base.DBSession()
-
+    #
     # if session.query(Stock).filter(Stock.name == works_name).first():
     #     print("已经存在")
     # else:
@@ -141,14 +134,19 @@ def worker(url):
     #         tag.append(session.query(Stock_Tag).filter(
     #             Stock_Tag.tag == i).first().id)
     #
-    # if session.query(Stock).filter(Stock.name == works_name).first():
-    #     print("已经存在")
-    # else:
+    #     try:
+    #         year = int(release_time[0])
+    #         month = int(release_time[1])
+    #         day = int(release_time[2])
+    #     except ValueError:
+    #         print(release_time)
+    #         year = 1980
+    #         month = 1
+    #         day = 1
     #     sub = Stock(name=works_name,
     #                 introduction=Introduction,
     #                 cover=cover,
-    #                 release_time=datetime.datetime(
-    #                     int(release_time[0]), int(release_time[1]), int(release_time[2])),
+    #                 release_time=datetime.datetime(year, month, day),
     #                 length_time=length_time,
     #                 works_series=works_series,
     #                 company=company,
@@ -161,6 +159,7 @@ def worker(url):
     #     print("插入成功")
 
 
+
 if __name__ == '__main__':
-    # worker('http://www.dmm.co.jp/digital/anime/-/detail/=/cid=h_511elu00003n/?i3_ref=list&i3_ord=112')
-    get_anime_link()
+    worker('http://www.dmm.co.jp/digital/anime/-/detail/=/cid=62gbr00009/?i3_ref=list&i3_ord=7')
+    # get_anime_link()
