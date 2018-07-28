@@ -107,57 +107,66 @@ def worker(url):
         day = int(release_time[2])
     except ValueError:
         day = int(release_time[2].split(' ')[0])
-    print("作品名：{},\n发布时间:{}，\n影片时长:{}，\n影片系列：{}，\n公司：{}，\n厂商：{}，\n类别：{}, \ncover:{}, \n简介:{}, \n截图:{}".format(
-        works_name,
-        release_time,
-        length_time,
-        works_series,
-        company,
-        factory,
-        category,
-        cover,
-        Introduction,
-        Screenshots
-    ))
-    # session = base.DBSession()
-    #
-    # if session.query(Stock).filter(Stock.name == works_name).first():
-    #     print("已经存在")
-    # else:
-    #     tag = []
-    #     for i in category:
-    #         if session.query(Stock_Tag).filter(
-    #                 Stock_Tag.tag == i).one_or_none() is None:
-    #             sub = Stock_Tag(tag=i)
-    #             session.add(sub)
-    #             session.commit()
-    #         tag.append(session.query(Stock_Tag).filter(
-    #             Stock_Tag.tag == i).first().id)
-    #
-    #     try:
-    #         year = int(release_time[0])
-    #         month = int(release_time[1])
-    #         day = int(release_time[2])
-    #     except ValueError:
-    #         print(release_time)
-    #         year = 1980
-    #         month = 1
-    #         day = 1
-    #     sub = Stock(name=works_name,
-    #                 introduction=Introduction,
-    #                 cover=cover,
-    #                 release_time=datetime.datetime(year, month, day),
-    #                 length_time=length_time,
-    #                 works_series=works_series,
-    #                 company=company,
-    #                 factory=factory,
-    #                 category=",".join(str(i) for i in tag),
-    #                 screenshots=",".join(i for i in Screenshots)
-    #                 )
-    #     session.add(sub)
-    #     session.commit()
-    #     print("插入成功")
+    # print("作品名：{},\n发布时间:{}，\n影片时长:{}，\n影片系列：{}，\n公司：{}，\n厂商：{}，\n类别：{}, \ncover:{}, \n简介:{}, \n截图:{}".format(
+    #     works_name,
+    #     release_time,
+    #     length_time,
+    #     works_series,
+    #     company,
+    #     factory,
+    #     category,
+    #     cover,
+    #     Introduction,
+    #     Screenshots
+    # ))
+    session = base.DBSession()
+    
+    if session.query(Stock).filter(Stock.name == works_name).first():
+        print("已经存在")
+    else:
+        tag = []
+        for i in category:
+            if session.query(Stock_Tag).filter(
+                    Stock_Tag.tag == i).one_or_none() is None:
+                sub = Stock_Tag(tag=i)
+                session.add(sub)
+                session.commit()
+            tag.append(session.query(Stock_Tag).filter(
+                Stock_Tag.tag == i).first().id)
+    
+        try:
+            year = int(release_time[0])
+            month = int(release_time[1])
+            day = int(release_time[2])
+        except ValueError:
+            print(release_time)
+            year = 1980
+            month = 1
+            day = 1
+        sub = Stock(name=works_name,
+                    introduction=Introduction,
+                    cover=cover,
+                    release_time=datetime.datetime(year, month, day),
+                    length_time=length_time,
+                    works_series=works_series,
+                    company=company,
+                    factory=factory,
+                    category=",".join(str(i) for i in tag),
+                    screenshots=",".join(i for i in Screenshots)
+                    )
+        session.add(sub)
+        session.commit()
+        print("插入成功")
 
+
+def get_anime_link():
+    anime_link = []
+    # session = models.DBSession()
+    for i in range(1, 18):
+        html = pq(get_web_page("{}page={}/".format(DMM_URL, i)))
+        for i in html("#list li .tmb a").items():
+            # print(i.attr("href").split()[0])
+            worker(i.attr("href"))
 
 
 if __name__ == '__main__':
