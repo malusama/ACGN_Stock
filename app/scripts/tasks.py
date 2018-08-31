@@ -6,7 +6,7 @@ import logging
 import functools
 import redis
 import datetime
-from celery_app import app
+# from celery_app import app
 
 
 import sys
@@ -19,7 +19,7 @@ from models import (
 
 
 redis_client = redis.Redis(host='localhost', port=6379,
-                           db=1, decode_responses=True)
+                           db=0, decode_responses=True)
 
 DMM_URL = 'http://www.dmm.co.jp/digital/anime/-/list/=/sort=ranking/'
 logger = logging.getLogger("test")
@@ -55,17 +55,17 @@ def retry(times=3):
 
 
 def get_web_page(url, timeout=15):
-    content = redis_client.get(url)
-    if content:
-        return content
+    # content = redis_client.get(url)
+    # if content:
+    #     return content
     with requests.Session() as session:
         session.headers['User-Agent'] = USER_AGENT
         try:
-            resp = session.get(url, timeout=timeout, proxies=proxies)
+            resp = session.get(url, timeout=timeout)
             if resp.status_code == 200:
                 logger.warning('missing cache for url: {}'.format(url))
                 content = resp.content
-                redis_client.setex(url, content, REQUEST_CACHE_TIMEOUT)
+                # redis_client.setex(url, content, REQUEST_CACHE_TIMEOUT)
                 web_page = content.decode('utf8')
                 return web_page
         except requests.exceptions.ConnectionError:
@@ -74,7 +74,7 @@ def get_web_page(url, timeout=15):
         logger.warning('Get web page {} error'.format(url))
 
 
-@app.task
+# @app.task
 def worker(url):
     print(url)
     # print(get_web_page('http://pv.sohu.com/cityjson?ie=utf-8'))
@@ -170,5 +170,6 @@ def get_anime_link():
 
 
 if __name__ == '__main__':
-    worker('http://www.dmm.co.jp/digital/anime/-/detail/=/cid=62gbr00009/?i3_ref=list&i3_ord=7')
-    # get_anime_link()
+    # worker('http://www.dmm.co.jp/digital/anime/-/detail/=/cid=62gbr00009/?i3_ref=list&i3_ord=7')
+    get_anime_link()
+    # print(content = redis_client.get("Tst"))
